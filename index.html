@@ -70,7 +70,6 @@
             font-size: 18px;
             border-radius: 50px;
             cursor: pointer;
-            margin: 10px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
             display: block;
@@ -79,12 +78,12 @@
             margin: 15px auto;
         }
 
-        .btn:hover {
+        .btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
         }
 
-        .btn:active {
+        .btn:active:not(:disabled) {
             transform: translateY(0);
         }
 
@@ -103,6 +102,11 @@
         .btn-danger {
             background: linear-gradient(45deg, #f44336, #d32f2f);
             box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
         }
 
         .code-input {
@@ -299,6 +303,26 @@
             font-weight: bold;
         }
 
+        .network-status {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 margin: 10px;
@@ -337,28 +361,43 @@
     </style>
 </head>
 <body>
+    <!-- Network Status Indicator -->
+    <div class="network-status" id="networkStatus">
+        🌐 Searching for network...
+    </div>
+
     <div class="container">
         <!-- Main Menu Screen -->
         <div class="screen active" id="menuScreen">
             <div class="menu">
-                <h1>🎮 Local Multiplayer</h1>
+                <h1>🎮 Local Network Multiplayer</h1>
                 <p style="text-align: center; color: #666; margin-bottom: 40px;">Play with friends on the same network</p>
                 
                 <button class="btn" id="hostBtn">🎯 Host Game</button>
                 <button class="btn btn-secondary" id="joinBtn">👥 Join Game</button>
                 
-                <div style="margin-top: 40px; color: #777; font-size: 14px;">
+                <div class="instructions">
+                    <h4>📋 How to Play:</h4>
+                    <ol style="text-align: left; padding-left: 20px; color: #666;">
+                        <li>All devices must be on the same WiFi network</li>
+                        <li>Host creates a room and shares the 4-digit code</li>
+                        <li>Joiners enter the code to join the room</li>
+                        <li>All players click "Ready"</li>
+                        <li>Game starts automatically when everyone is ready</li>
+                    </ol>
+                </div>
+                
+                <div style="margin-top: 20px; color: #777; font-size: 14px;">
                     <p>📱 Works on PC & Mobile</p>
-                    <p>🌐 Same Local Network Required</p>
-                    <p>🔄 Refresh to clear all rooms</p>
+                    <p>🔄 Refresh page to reset connection</p>
                 </div>
             </div>
         </div>
 
         <!-- Host Screen -->
         <div class="screen" id="hostScreen">
-            <h2>Host Game</h2>
-            <p style="text-align: center; color: #666; margin-bottom: 30px;">Share this code with other players</p>
+            <h2>🎯 Host Game</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">Share this code with other players on the same network</p>
             
             <div class="room-code" id="roomCodeDisplay">----</div>
             <div style="text-align: center;">
@@ -376,15 +415,20 @@
                 </div>
             </div>
             
+            <div class="loading" id="hostLoading">
+                <div class="spinner"></div>
+                <p>Waiting for players to join...</p>
+            </div>
+            
             <div class="controls">
                 <button class="btn btn-danger" id="closeRoomBtn">🚪 Close Room</button>
-                <button class="btn btn-secondary" id="startGameBtn" disabled>🚀 Start Game (Auto)</button>
+                <button class="btn btn-warning" id="refreshPlayersBtn">🔄 Refresh Players</button>
             </div>
         </div>
 
         <!-- Join Screen -->
         <div class="screen" id="joinScreen">
-            <h2>Join Game</h2>
+            <h2>👥 Join Game</h2>
             <p style="text-align: center; color: #666; margin-bottom: 30px;">Enter the 4-digit room code from host</p>
             
             <div class="code-input">
@@ -396,11 +440,11 @@
             
             <div class="loading" id="joinLoading">
                 <div class="spinner"></div>
-                <p>Connecting to room...</p>
+                <p id="joinStatus">Searching for room...</p>
             </div>
             
             <div class="controls">
-                <button class="btn" id="backToMenuBtn2">← Back</button>
+                <button class="btn" id="backToMenuBtn1">← Back to Menu</button>
                 <button class="btn btn-secondary" id="joinRoomBtn">🔗 Join Room</button>
             </div>
         </div>
@@ -419,6 +463,11 @@
                 </div>
             </div>
             
+            <div class="loading" id="lobbyLoading">
+                <div class="spinner"></div>
+                <p>Syncing with host...</p>
+            </div>
+            
             <div class="controls">
                 <button class="btn btn-danger" id="leaveRoomBtn">← Leave Room</button>
                 <button class="btn btn-secondary" id="readyBtn">✅ Ready</button>
@@ -427,7 +476,7 @@
 
         <!-- Game Screen -->
         <div class="screen" id="gameScreen">
-            <h2>Game Started! - Room: <span id="gameRoomCode">----</span></h2>
+            <h2>🎮 Game Started! - Room: <span id="gameRoomCode">----</span></h2>
             
             <div class="score-board">
                 <div class="score-item">
@@ -471,19 +520,228 @@
     <div id="messageContainer"></div>
 
     <script>
-        // Système global de salles partagées (simulé pour le même réseau)
-        // Dans un vrai système, on utiliserait WebSockets ou WebRTC
-        window.sharedRooms = window.sharedRooms || {
-            rooms: {},
-            nextCheckId: 1
-        };
+        // Système de communication amélioré pour réseau local
+        class NetworkManager {
+            constructor() {
+                this.rooms = {};
+                this.messages = {};
+                this.pingInterval = null;
+                this.cleanupInterval = null;
+                this.messageId = 0;
+                this.peers = new Set();
+                this.networkId = 'local-multiplayer-' + Date.now();
+                
+                // Try to use BroadcastChannel for same-device communication
+                try {
+                    this.broadcastChannel = new BroadcastChannel('game-network');
+                    this.broadcastChannel.onmessage = (event) => this.handleBroadcast(event.data);
+                } catch (e) {
+                    console.log('BroadcastChannel not supported');
+                }
+                
+                // Try to use localStorage for cross-tab communication
+                this.storageKey = 'game-network-messages';
+                window.addEventListener('storage', (e) => this.handleStorage(e));
+                
+                this.startNetwork();
+            }
+            
+            startNetwork() {
+                // Send periodic pings to discover peers
+                this.pingInterval = setInterval(() => {
+                    this.sendBroadcast({
+                        type: 'ping',
+                        sender: this.networkId,
+                        timestamp: Date.now()
+                    });
+                }, 2000);
+                
+                // Cleanup old messages
+                this.cleanupInterval = setInterval(() => {
+                    this.cleanupOldMessages();
+                }, 10000);
+            }
+            
+            sendBroadcast(data) {
+                const message = {
+                    ...data,
+                    messageId: this.messageId++,
+                    sender: this.networkId,
+                    timestamp: Date.now()
+                };
+                
+                // Store in localStorage for cross-tab
+                try {
+                    const messages = JSON.parse(localStorage.getItem(this.storageKey) || '[]');
+                    messages.push(message);
+                    // Keep only last 50 messages
+                    if (messages.length > 50) messages.splice(0, messages.length - 50);
+                    localStorage.setItem(this.storageKey, JSON.stringify(messages));
+                    localStorage.setItem(this.storageKey + '-trigger', Date.now().toString());
+                } catch (e) {}
+                
+                // Send via BroadcastChannel
+                if (this.broadcastChannel) {
+                    this.broadcastChannel.postMessage(message);
+                }
+            }
+            
+            handleBroadcast(data) {
+                if (data.sender === this.networkId) return; // Ignore own messages
+                
+                this.processMessage(data);
+            }
+            
+            handleStorage(event) {
+                if (event.key === this.storageKey + '-trigger') {
+                    try {
+                        const messages = JSON.parse(localStorage.getItem(this.storageKey) || '[]');
+                        messages.forEach(msg => {
+                            if (msg.sender !== this.networkId) {
+                                this.processMessage(msg);
+                            }
+                        });
+                    } catch (e) {}
+                }
+            }
+            
+            processMessage(data) {
+                // Update peer list
+                if (data.type === 'ping') {
+                    this.peers.add(data.sender);
+                    this.sendBroadcast({
+                        type: 'pong',
+                        sender: this.networkId,
+                        timestamp: Date.now()
+                    });
+                }
+                
+                // Handle room creation
+                if (data.type === 'room_created') {
+                    this.rooms[data.roomCode] = {
+                        host: data.sender,
+                        players: data.players || {},
+                        timestamp: Date.now()
+                    };
+                }
+                
+                // Handle room update
+                if (data.type === 'room_updated') {
+                    if (this.rooms[data.roomCode]) {
+                        this.rooms[data.roomCode] = {
+                            ...this.rooms[data.roomCode],
+                            ...data.data,
+                            timestamp: Date.now()
+                        };
+                    }
+                }
+                
+                // Handle player join
+                if (data.type === 'player_joined') {
+                    if (this.rooms[data.roomCode]) {
+                        this.rooms[data.roomCode].players[data.player.id] = data.player;
+                        this.rooms[data.roomCode].timestamp = Date.now();
+                    }
+                }
+                
+                // Handle room deletion
+                if (data.type === 'room_closed') {
+                    delete this.rooms[data.roomCode];
+                }
+                
+                // Store message
+                this.messages[data.messageId] = data;
+            }
+            
+            cleanupOldMessages() {
+                const now = Date.now();
+                Object.keys(this.rooms).forEach(code => {
+                    if (now - this.rooms[code].timestamp > 30000) { // 30 seconds
+                        delete this.rooms[code];
+                    }
+                });
+                
+                // Cleanup old peers
+                Array.from(this.peers).forEach(peer => {
+                    // We don't track peer timestamps, just keep them
+                });
+            }
+            
+            createRoom(roomCode, player) {
+                const room = {
+                    host: this.networkId,
+                    players: { [player.id]: player },
+                    timestamp: Date.now()
+                };
+                
+                this.rooms[roomCode] = room;
+                
+                this.sendBroadcast({
+                    type: 'room_created',
+                    roomCode: roomCode,
+                    players: room.players,
+                    timestamp: Date.now()
+                });
+            }
+            
+            updateRoom(roomCode, data) {
+                if (this.rooms[roomCode]) {
+                    this.rooms[roomCode] = {
+                        ...this.rooms[roomCode],
+                        ...data,
+                        timestamp: Date.now()
+                    };
+                    
+                    this.sendBroadcast({
+                        type: 'room_updated',
+                        roomCode: roomCode,
+                        data: data
+                    });
+                }
+            }
+            
+            joinRoom(roomCode, player) {
+                if (this.rooms[roomCode]) {
+                    this.rooms[roomCode].players[player.id] = player;
+                    this.rooms[roomCode].timestamp = Date.now();
+                    
+                    this.sendBroadcast({
+                        type: 'player_joined',
+                        roomCode: roomCode,
+                        player: player
+                    });
+                    
+                    return true;
+                }
+                return false;
+            }
+            
+            closeRoom(roomCode) {
+                if (this.rooms[roomCode]) {
+                    delete this.rooms[roomCode];
+                    
+                    this.sendBroadcast({
+                        type: 'room_closed',
+                        roomCode: roomCode
+                    });
+                }
+            }
+            
+            getRoom(roomCode) {
+                return this.rooms[roomCode];
+            }
+            
+            getAllRooms() {
+                return this.rooms;
+            }
+        }
 
         // Game State
         const gameState = {
             currentScreen: 'menu',
             isHost: false,
             roomCode: '',
-            playerId: generatePlayerId(),
+            playerId: 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
             playerName: generatePlayerName(),
             players: {},
             readyPlayers: new Set(),
@@ -491,8 +749,9 @@
             round: 1,
             timer: 60,
             scores: {},
-            checkInterval: null,
-            roomExistsInterval: null
+            syncInterval: null,
+            networkManager: null,
+            lastUpdateTime: 0
         };
 
         // DOM Elements
@@ -502,10 +761,16 @@
         function init() {
             initializeElements();
             setupEventListeners();
-            showMessage('Welcome! All devices must be on the same WiFi network.', 'info');
             
-            // Nettoyer les anciennes salles au démarrage
-            cleanupOldRooms();
+            // Initialize network manager
+            gameState.networkManager = new NetworkManager();
+            
+            updateNetworkStatus();
+            showMessage('Welcome! Make sure all devices are on the same WiFi network.', 'info');
+            
+            // Start periodic network updates
+            setInterval(updateNetworkStatus, 5000);
+            setInterval(cleanupOldRooms, 10000);
         }
 
         function initializeElements() {
@@ -519,6 +784,8 @@
                 endGameBtn: document.getElementById('endGameBtn'),
                 copyCodeBtn: document.getElementById('copyCodeBtn'),
                 closeRoomBtn: document.getElementById('closeRoomBtn'),
+                refreshPlayersBtn: document.getElementById('refreshPlayersBtn'),
+                backToMenuBtn1: document.getElementById('backToMenuBtn1'),
                 roomCodeDisplay: document.getElementById('roomCodeDisplay'),
                 currentRoomCode: document.getElementById('currentRoomCode'),
                 gameRoomCode: document.getElementById('gameRoomCode'),
@@ -528,6 +795,8 @@
                 codeDigits: document.querySelectorAll('.code-digit'),
                 hostLoading: document.getElementById('hostLoading'),
                 joinLoading: document.getElementById('joinLoading'),
+                lobbyLoading: document.getElementById('lobbyLoading'),
+                joinStatus: document.getElementById('joinStatus'),
                 playerCount: document.getElementById('playerCount'),
                 roundCount: document.getElementById('roundCount'),
                 timer: document.getElementById('timer'),
@@ -537,6 +806,7 @@
                 hostPlayerCount: document.getElementById('hostPlayerCount'),
                 lobbyPlayerCount: document.getElementById('lobbyPlayerCount'),
                 roomStatus: document.getElementById('roomStatus'),
+                networkStatus: document.getElementById('networkStatus'),
                 menuScreen: document.getElementById('menuScreen'),
                 hostScreen: document.getElementById('hostScreen'),
                 joinScreen: document.getElementById('joinScreen'),
@@ -549,11 +819,12 @@
             // Navigation
             elements.hostBtn.addEventListener('click', () => switchScreen('host'));
             elements.joinBtn.addEventListener('click', () => switchScreen('join'));
+            elements.backToMenuBtn1.addEventListener('click', () => switchScreen('menu'));
             
             // Host actions
-            elements.startGameBtn.addEventListener('click', startGame);
             elements.copyCodeBtn.addEventListener('click', copyRoomCode);
             elements.closeRoomBtn.addEventListener('click', closeRoom);
+            elements.refreshPlayersBtn.addEventListener('click', refreshPlayers);
             
             // Join actions
             elements.joinRoomBtn.addEventListener('click', joinRoom);
@@ -589,13 +860,9 @@
 
         function switchScreen(screenName) {
             // Stop any existing intervals
-            if (gameState.checkInterval) {
-                clearInterval(gameState.checkInterval);
-                gameState.checkInterval = null;
-            }
-            if (gameState.roomExistsInterval) {
-                clearInterval(gameState.roomExistsInterval);
-                gameState.roomExistsInterval = null;
+            if (gameState.syncInterval) {
+                clearInterval(gameState.syncInterval);
+                gameState.syncInterval = null;
             }
             
             // Hide all screens
@@ -615,24 +882,35 @@
                 cleanupConnections();
             } else if (screenName === 'join') {
                 elements.codeDigits[0].focus();
-            } else if (screenName === 'lobby' && !gameState.isHost) {
-                // Vérifier périodiquement si la salle existe encore
-                checkRoomExists();
+                elements.joinLoading.classList.remove('active');
+            } else if (screenName === 'lobby') {
+                startLobbySync();
             }
         }
 
         function generateRoomCode() {
-            return Math.floor(1000 + Math.random() * 9000).toString();
-        }
-
-        function generatePlayerId() {
-            return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+            // Generate a memorable 4-digit code
+            const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+            const numbers = '23456789';
+            let code = '';
+            
+            // First two characters: letters
+            for (let i = 0; i < 2; i++) {
+                code += letters[Math.floor(Math.random() * letters.length)];
+            }
+            
+            // Last two characters: numbers
+            for (let i = 0; i < 2; i++) {
+                code += numbers[Math.floor(Math.random() * numbers.length)];
+            }
+            
+            return code;
         }
 
         function generatePlayerName() {
-            const names = ['Warrior', 'Mage', 'Rogue', 'Archer', 'Knight', 'Wizard', 'Ninja', 'Samurai'];
-            const colors = ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Orange', 'Pink', 'Cyan'];
-            return colors[Math.floor(Math.random() * colors.length)] + ' ' + names[Math.floor(Math.random() * names.length)];
+            const adjectives = ['Swift', 'Brave', 'Clever', 'Mighty', 'Silent', 'Royal', 'Golden', 'Shadow', 'Crimson', 'Solar'];
+            const nouns = ['Fox', 'Wolf', 'Eagle', 'Lion', 'Dragon', 'Phoenix', 'Tiger', 'Bear', 'Hawk', 'Falcon'];
+            return adjectives[Math.floor(Math.random() * adjectives.length)] + ' ' + nouns[Math.floor(Math.random() * nouns.length)];
         }
 
         function createRoom() {
@@ -644,196 +922,240 @@
                     name: gameState.playerName,
                     ready: true,
                     isHost: true,
-                    score: 0
+                    score: 0,
+                    joinedAt: Date.now()
                 }
             };
             gameState.readyPlayers.clear();
             gameState.readyPlayers.add(gameState.playerId);
             
-            // Enregistrer la salle dans le système partagé
-            window.sharedRooms.rooms[gameState.roomCode] = {
-                hostId: gameState.playerId,
-                players: gameState.players,
-                readyPlayers: Array.from(gameState.readyPlayers),
-                createdAt: Date.now(),
-                lastUpdated: Date.now()
-            };
+            // Create room in network manager
+            if (gameState.networkManager) {
+                gameState.networkManager.createRoom(
+                    gameState.roomCode, 
+                    gameState.players[gameState.playerId]
+                );
+            }
             
             if (elements.roomCodeDisplay) {
                 elements.roomCodeDisplay.textContent = gameState.roomCode;
+            }
+            if (elements.hostLoading) {
+                elements.hostLoading.classList.add('active');
             }
             
             updatePlayerList();
             showMessage(`Room created! Code: ${gameState.roomCode}`, 'success');
             
-            // Démarrer la vérification périodique des joueurs
+            // Start syncing room state
             startRoomSync();
         }
 
         function startRoomSync() {
-            if (gameState.checkInterval) {
-                clearInterval(gameState.checkInterval);
+            if (gameState.syncInterval) {
+                clearInterval(gameState.syncInterval);
             }
             
-            gameState.checkInterval = setInterval(() => {
+            gameState.syncInterval = setInterval(() => {
                 if (!gameState.isHost || gameState.currentScreen !== 'host') return;
                 
-                // Mettre à jour la salle dans le système partagé
-                if (window.sharedRooms.rooms[gameState.roomCode]) {
-                    window.sharedRooms.rooms[gameState.roomCode] = {
-                        hostId: gameState.playerId,
+                // Update room in network
+                if (gameState.networkManager) {
+                    gameState.networkManager.updateRoom(gameState.roomCode, {
                         players: gameState.players,
                         readyPlayers: Array.from(gameState.readyPlayers),
-                        createdAt: window.sharedRooms.rooms[gameState.roomCode].createdAt,
-                        lastUpdated: Date.now()
-                    };
+                        gameActive: gameState.gameActive
+                    });
                 }
                 
-                // Vérifier si tous les joueurs sont prêts
+                // Check for new players
+                syncPlayersFromNetwork();
+                
+                // Check if all players are ready
                 checkAllPlayersReady();
                 
-                // Synchroniser avec le système partagé (pour les joueurs qui rejoignent)
-                syncWithSharedRoom();
-                
-            }, 1000);
+            }, 2000);
         }
 
-        function syncWithSharedRoom() {
-            if (!gameState.isHost || !window.sharedRooms.rooms[gameState.roomCode]) return;
+        function syncPlayersFromNetwork() {
+            if (!gameState.networkManager || !gameState.roomCode) return;
             
-            const sharedRoom = window.sharedRooms.rooms[gameState.roomCode];
+            const networkRoom = gameState.networkManager.getRoom(gameState.roomCode);
+            if (!networkRoom) return;
             
-            // Mettre à jour la liste des joueurs à partir de la salle partagée
-            Object.keys(sharedRoom.players).forEach(playerId => {
+            let updated = false;
+            
+            // Add new players from network
+            Object.keys(networkRoom.players).forEach(playerId => {
                 if (!gameState.players[playerId]) {
-                    // Nouveau joueur détecté
-                    gameState.players[playerId] = sharedRoom.players[playerId];
-                    showMessage(`${sharedRoom.players[playerId].name} joined the room!`, 'info');
+                    gameState.players[playerId] = networkRoom.players[playerId];
+                    updated = true;
+                    showMessage(`${networkRoom.players[playerId].name} joined the room!`, 'info');
                 }
             });
             
-            // Mettre à jour les états "ready"
-            sharedRoom.readyPlayers.forEach(playerId => {
-                if (gameState.players[playerId]) {
-                    gameState.players[playerId].ready = true;
-                    gameState.readyPlayers.add(playerId);
+            // Remove players that left (keep for 30 seconds)
+            const now = Date.now();
+            Object.keys(gameState.players).forEach(playerId => {
+                if (!networkRoom.players[playerId]) {
+                    if (now - gameState.players[playerId].joinedAt > 30000) {
+                        delete gameState.players[playerId];
+                        gameState.readyPlayers.delete(playerId);
+                        updated = true;
+                    }
                 }
             });
             
-            updatePlayerList();
+            if (updated) {
+                updatePlayerList();
+            }
         }
 
         function joinRoom() {
             const code = Array.from(elements.codeDigits).map(d => d.value).join('');
             
-            if (code.length !== 4 || !/^\d+$/.test(code)) {
+            if (code.length !== 4) {
                 showMessage('Please enter a valid 4-digit code', 'error');
                 return;
             }
             
-            // Vérifier si la salle existe
-            if (!window.sharedRooms.rooms[code]) {
-                showMessage('Room not found. Make sure the host has created the room.', 'error');
-                return;
-            }
-            
-            // Vérifier si la salle est pleine
-            const roomPlayers = Object.keys(window.sharedRooms.rooms[code].players);
-            if (roomPlayers.length >= 8) {
-                showMessage('Room is full (max 8 players)', 'error');
-                return;
-            }
-            
             gameState.isHost = false;
-            gameState.roomCode = code;
+            gameState.roomCode = code.toUpperCase();
             gameState.players = {};
             gameState.readyPlayers.clear();
             
             if (elements.currentRoomCode) {
-                elements.currentRoomCode.textContent = code;
+                elements.currentRoomCode.textContent = gameState.roomCode;
             }
             if (elements.joinLoading) {
                 elements.joinLoading.classList.add('active');
+                elements.joinStatus.textContent = 'Searching for room...';
             }
             if (elements.joinRoomBtn) {
                 elements.joinRoomBtn.disabled = true;
             }
             
-            // Simuler la connexion
+            // Try to join room
             setTimeout(() => {
-                if (elements.joinLoading) {
-                    elements.joinLoading.classList.remove('active');
+                if (!gameState.networkManager) {
+                    showMessage('Network error. Please refresh.', 'error');
+                    return;
                 }
                 
-                // S'enregistrer dans la salle partagée
+                const networkRoom = gameState.networkManager.getRoom(gameState.roomCode);
+                
+                if (!networkRoom) {
+                    elements.joinStatus.textContent = 'Room not found';
+                    setTimeout(() => {
+                        if (elements.joinLoading) {
+                            elements.joinLoading.classList.remove('active');
+                        }
+                        if (elements.joinRoomBtn) {
+                            elements.joinRoomBtn.disabled = false;
+                        }
+                        showMessage('Room not found. Make sure the host has created the room and both devices are on the same network.', 'error');
+                    }, 1000);
+                    return;
+                }
+                
+                // Room found, try to join
                 const playerData = {
                     id: gameState.playerId,
                     name: gameState.playerName,
                     ready: false,
                     isHost: false,
-                    score: 0
+                    score: 0,
+                    joinedAt: Date.now()
                 };
                 
-                window.sharedRooms.rooms[code].players[gameState.playerId] = playerData;
-                window.sharedRooms.rooms[code].lastUpdated = Date.now();
+                // Check if room is full
+                const playerCount = Object.keys(networkRoom.players || {}).length;
+                if (playerCount >= 8) {
+                    elements.joinStatus.textContent = 'Room is full';
+                    setTimeout(() => {
+                        if (elements.joinLoading) {
+                            elements.joinLoading.classList.remove('active');
+                        }
+                        if (elements.joinRoomBtn) {
+                            elements.joinRoomBtn.disabled = false;
+                        }
+                        showMessage('Room is full (max 8 players)', 'error');
+                    }, 1000);
+                    return;
+                }
                 
-                // Copier les données de la salle
-                gameState.players = JSON.parse(JSON.stringify(window.sharedRooms.rooms[code].players));
+                // Join room
+                const success = gameState.networkManager.joinRoom(gameState.roomCode, playerData);
                 
-                switchScreen('lobby');
-                showMessage(`Joined room ${code}!`, 'success');
-                updatePlayerList();
+                if (success) {
+                    elements.joinStatus.textContent = 'Joining room...';
+                    
+                    setTimeout(() => {
+                        if (elements.joinLoading) {
+                            elements.joinLoading.classList.remove('active');
+                        }
+                        switchScreen('lobby');
+                        showMessage(`Joined room ${gameState.roomCode}!`, 'success');
+                        
+                        // Get initial player list
+                        syncPlayersFromNetwork();
+                        updatePlayerList();
+                        
+                    }, 1500);
+                } else {
+                    elements.joinStatus.textContent = 'Failed to join';
+                    setTimeout(() => {
+                        if (elements.joinLoading) {
+                            elements.joinLoading.classList.remove('active');
+                        }
+                        if (elements.joinRoomBtn) {
+                            elements.joinRoomBtn.disabled = false;
+                        }
+                        showMessage('Failed to join room. Please try again.', 'error');
+                    }, 1000);
+                }
                 
-                // Démarrer la synchronisation avec l'hôte
-                startPlayerSync();
-                
-            }, 1000);
+            }, 1500);
         }
 
-        function startPlayerSync() {
-            if (gameState.checkInterval) {
-                clearInterval(gameState.checkInterval);
+        function startLobbySync() {
+            if (gameState.syncInterval) {
+                clearInterval(gameState.syncInterval);
             }
             
-            gameState.checkInterval = setInterval(() => {
+            gameState.syncInterval = setInterval(() => {
                 if (gameState.isHost || gameState.currentScreen !== 'lobby') return;
                 
-                const room = window.sharedRooms.rooms[gameState.roomCode];
-                if (!room) {
+                if (!gameState.networkManager) return;
+                
+                const networkRoom = gameState.networkManager.getRoom(gameState.roomCode);
+                
+                if (!networkRoom) {
                     showMessage('Room has been closed by host', 'error');
                     leaveRoom();
                     return;
                 }
                 
-                // Mettre à jour les données locales avec celles de la salle partagée
-                gameState.players = JSON.parse(JSON.stringify(room.players));
-                gameState.readyPlayers = new Set(room.readyPlayers || []);
+                // Update player list from network
+                gameState.players = { ...networkRoom.players };
                 
-                // Mettre à jour l'état "ready" du joueur local
+                // Update ready players
+                if (networkRoom.readyPlayers) {
+                    gameState.readyPlayers = new Set(networkRoom.readyPlayers);
+                }
+                
+                // Update own ready status
                 if (gameState.players[gameState.playerId]) {
                     gameState.players[gameState.playerId].ready = gameState.readyPlayers.has(gameState.playerId);
                 }
                 
                 updatePlayerList();
                 
-                // Vérifier si le jeu a commencé
-                if (room.gameStarted && gameState.currentScreen === 'lobby') {
+                // Check if game has started
+                if (networkRoom.gameActive && gameState.currentScreen === 'lobby') {
                     startGameFromHost();
                 }
                 
-            }, 1000);
-        }
-
-        function checkRoomExists() {
-            if (gameState.roomExistsInterval) {
-                clearInterval(gameState.roomExistsInterval);
-            }
-            
-            gameState.roomExistsInterval = setInterval(() => {
-                if (!window.sharedRooms.rooms[gameState.roomCode]) {
-                    showMessage('Room has been closed by host', 'error');
-                    leaveRoom();
-                }
             }, 2000);
         }
 
@@ -859,19 +1181,15 @@
                 }
             }
             
-            // Mettre à jour la salle partagée
-            if (window.sharedRooms.rooms[gameState.roomCode]) {
-                window.sharedRooms.rooms[gameState.roomCode].players[gameState.playerId].ready = player.ready;
-                window.sharedRooms.rooms[gameState.roomCode].readyPlayers = Array.from(gameState.readyPlayers);
-                window.sharedRooms.rooms[gameState.roomCode].lastUpdated = Date.now();
+            // Update network
+            if (gameState.networkManager) {
+                gameState.networkManager.updateRoom(gameState.roomCode, {
+                    players: gameState.players,
+                    readyPlayers: Array.from(gameState.readyPlayers)
+                });
             }
             
             updatePlayerList();
-            
-            // Si hôte, vérifier si tous les joueurs sont prêts
-            if (gameState.isHost) {
-                checkAllPlayersReady();
-            }
         }
 
         function checkAllPlayersReady() {
@@ -881,15 +1199,16 @@
             const allReady = allPlayers.length >= 2 && 
                            allPlayers.every(id => gameState.readyPlayers.has(id));
             
-            elements.startGameBtn.disabled = !allReady;
-            
             if (allReady && allPlayers.length >= 2) {
-                showMessage('All players ready! Starting game in 3 seconds...', 'success');
-                setTimeout(() => {
-                    if (gameState.currentScreen === 'host' && allReady) {
-                        startGame();
-                    }
-                }, 3000);
+                // Auto-start game after 3 seconds
+                if (!gameState.gameActive) {
+                    showMessage('All players ready! Starting game in 3 seconds...', 'success');
+                    setTimeout(() => {
+                        if (gameState.currentScreen === 'host' && allReady) {
+                            startGame();
+                        }
+                    }, 3000);
+                }
             }
         }
 
@@ -901,15 +1220,17 @@
             gameState.timer = 60;
             gameState.scores = {};
             
-            // Initialiser les scores
+            // Initialize scores
             Object.keys(gameState.players).forEach(playerId => {
                 gameState.scores[playerId] = 0;
             });
             
-            // Marquer le jeu comme commencé dans la salle partagée
-            if (window.sharedRooms.rooms[gameState.roomCode]) {
-                window.sharedRooms.rooms[gameState.roomCode].gameStarted = true;
-                window.sharedRooms.rooms[gameState.roomCode].lastUpdated = Date.now();
+            // Update network
+            if (gameState.networkManager) {
+                gameState.networkManager.updateRoom(gameState.roomCode, {
+                    gameActive: true,
+                    round: gameState.round
+                });
             }
             
             switchScreen('game');
@@ -926,7 +1247,7 @@
             gameState.timer = 60;
             gameState.scores = {};
             
-            // Initialiser les scores
+            // Initialize scores
             Object.keys(gameState.players).forEach(playerId => {
                 gameState.scores[playerId] = 0;
             });
@@ -961,25 +1282,25 @@
         function handleTargetClick() {
             if (!gameState.gameActive) return;
             
-            // Mettre à jour le score
+            // Update score
             if (!gameState.scores[gameState.playerId]) {
                 gameState.scores[gameState.playerId] = 0;
             }
             gameState.scores[gameState.playerId]++;
             
-            // Mettre à jour l'UI
+            // Update UI
             if (elements.yourClicks) {
                 elements.yourClicks.textContent = gameState.scores[gameState.playerId];
             }
             
-            // Feedback visuel
+            // Visual feedback
             if (elements.target) {
                 elements.target.style.transform = 'scale(0.9)';
                 setTimeout(() => {
                     elements.target.style.transform = 'scale(1)';
                 }, 100);
                 
-                // Déplacer la cible aléatoirement
+                // Move target randomly
                 const gameArea = document.querySelector('.game-area');
                 if (gameArea) {
                     const maxX = gameArea.clientWidth - 120;
@@ -1000,7 +1321,7 @@
         function endRound() {
             gameState.gameActive = false;
             
-            // Déterminer le gagnant
+            // Determine winner
             let winner = null;
             let highestScore = 0;
             
@@ -1011,10 +1332,10 @@
                 }
             });
             
-            // Afficher les résultats
+            // Show results
             showMessage(`Round ${gameState.round} ended! Winner: ${gameState.players[winner]?.name || 'No one'}`, 'success');
             
-            // Si hôte, décider du prochain round
+            // If host, decide next round
             if (gameState.isHost) {
                 setTimeout(() => {
                     if (confirm('Start next round?')) {
@@ -1022,13 +1343,15 @@
                         gameState.gameActive = true;
                         gameState.timer = 60;
                         
-                        // Réinitialiser les scores pour le nouveau round
+                        // Reset scores for new round
                         Object.keys(gameState.scores).forEach(playerId => {
                             gameState.scores[playerId] = 0;
                         });
                         
                         startGameTimer();
                         updateGameUI();
+                    } else {
+                        endGame();
                     }
                 }, 2000);
             }
@@ -1040,9 +1363,11 @@
             showMessage('Game ended!', 'info');
             
             if (gameState.isHost) {
-                // Retirer le drapeau de jeu commencé
-                if (window.sharedRooms.rooms[gameState.roomCode]) {
-                    window.sharedRooms.rooms[gameState.roomCode].gameStarted = false;
+                // Update network
+                if (gameState.networkManager) {
+                    gameState.networkManager.updateRoom(gameState.roomCode, {
+                        gameActive: false
+                    });
                 }
                 switchScreen('host');
             } else {
@@ -1058,9 +1383,9 @@
                 endGame();
             }
             
-            // Supprimer la salle du système partagé
-            if (window.sharedRooms.rooms[gameState.roomCode]) {
-                delete window.sharedRooms.rooms[gameState.roomCode];
+            // Close room in network
+            if (gameState.networkManager) {
+                gameState.networkManager.closeRoom(gameState.roomCode);
             }
             
             cleanupConnections();
@@ -1073,28 +1398,23 @@
                 endGame();
             }
             
-            // Retirer le joueur de la salle partagée
-            if (window.sharedRooms.rooms[gameState.roomCode]) {
-                delete window.sharedRooms.rooms[gameState.roomCode].players[gameState.playerId];
-                window.sharedRooms.rooms[gameState.roomCode].lastUpdated = Date.now();
-                
-                // Mettre à jour la liste des joueurs prêts
-                const readyIndex = window.sharedRooms.rooms[gameState.roomCode].readyPlayers.indexOf(gameState.playerId);
-                if (readyIndex > -1) {
-                    window.sharedRooms.rooms[gameState.roomCode].readyPlayers.splice(readyIndex, 1);
-                }
-            }
-            
             cleanupConnections();
             switchScreen('menu');
             showMessage('Left the room', 'info');
+        }
+
+        function refreshPlayers() {
+            if (gameState.isHost && gameState.networkManager) {
+                syncPlayersFromNetwork();
+                showMessage('Refreshed player list', 'info');
+            }
         }
 
         function updatePlayerList() {
             const playerCount = Object.keys(gameState.players).length;
             const readyCount = gameState.readyPlayers.size;
             
-            // Mettre à jour la liste des joueurs de l'hôte
+            // Update host player list
             if (elements.hostPlayerList && elements.hostPlayerCount) {
                 elements.hostPlayerList.innerHTML = '';
                 Object.values(gameState.players).forEach(player => {
@@ -1114,16 +1434,13 @@
                 
                 elements.hostPlayerCount.textContent = `Players (${playerCount}/8) - Ready: ${readyCount}/${playerCount}`;
                 
-                // Mettre à jour le statut de la salle
-                if (elements.roomStatus && !gameState.isHost) {
-                    elements.roomStatus.innerHTML = `
-                        <div>Waiting for all players to be ready</div>
-                        <div style="font-size: 14px; margin-top: 5px;">Ready: ${readyCount}/${playerCount}</div>
-                    `;
+                // Update loading state
+                if (playerCount > 1) {
+                    elements.hostLoading.classList.remove('active');
                 }
             }
             
-            // Mettre à jour la liste des joueurs du lobby
+            // Update lobby player list
             if (elements.lobbyPlayerList && elements.lobbyPlayerCount) {
                 elements.lobbyPlayerList.innerHTML = '';
                 Object.values(gameState.players).forEach(player => {
@@ -1142,9 +1459,25 @@
                 });
                 
                 elements.lobbyPlayerCount.textContent = `Players (${playerCount}/8) - Ready: ${readyCount}/${playerCount}`;
+                
+                // Update room status
+                if (elements.roomStatus) {
+                    if (playerCount < 2) {
+                        elements.roomStatus.innerHTML = 'Waiting for more players (minimum 2)...';
+                    } else if (readyCount === playerCount) {
+                        elements.roomStatus.innerHTML = 'All players ready! Game starting soon...';
+                    } else {
+                        elements.roomStatus.innerHTML = `Waiting for players to be ready: ${readyCount}/${playerCount}`;
+                    }
+                }
+                
+                // Hide loading when players are loaded
+                if (playerCount > 0 && elements.lobbyLoading) {
+                    elements.lobbyLoading.classList.remove('active');
+                }
             }
             
-            // Mettre à jour le bouton Ready
+            // Update ready button
             if (elements.readyBtn && !gameState.isHost) {
                 const player = gameState.players[gameState.playerId];
                 if (player) {
@@ -1164,27 +1497,27 @@
         function updateGameUI() {
             const playerCount = Object.keys(gameState.players).length;
             
-            // Mettre à jour le nombre de joueurs
+            // Update player count
             if (elements.playerCount) {
                 elements.playerCount.textContent = playerCount;
             }
             
-            // Mettre à jour le round
+            // Update round
             if (elements.roundCount) {
                 elements.roundCount.textContent = gameState.round;
             }
             
-            // Mettre à jour le timer
+            // Update timer
             if (elements.timer) {
                 elements.timer.textContent = gameState.timer;
             }
             
-            // Mettre à jour vos clics
+            // Update your clicks
             if (elements.yourClicks) {
                 elements.yourClicks.textContent = gameState.scores[gameState.playerId] || 0;
             }
             
-            // Mettre à jour les scores des joueurs dans le jeu
+            // Update player scores in game
             if (elements.gamePlayerList) {
                 elements.gamePlayerList.innerHTML = '';
                 Object.values(gameState.players).forEach(player => {
@@ -1207,8 +1540,8 @@
 
         function copyRoomCode() {
             navigator.clipboard.writeText(gameState.roomCode)
-                .then(() => showMessage('Room code copied!', 'success'))
-                .catch(() => showMessage('Failed to copy code', 'error'));
+                .then(() => showMessage('Room code copied to clipboard!', 'success'))
+                .catch(() => showMessage('Failed to copy code. Please write it down.', 'error'));
         }
 
         function showMessage(text, type) {
@@ -1220,7 +1553,7 @@
             
             elements.messageContainer.appendChild(message);
             
-            // Supprimer le message après 3 secondes
+            // Remove message after 3 seconds
             setTimeout(() => {
                 message.style.opacity = '0';
                 message.style.transform = 'translateX(100%)';
@@ -1228,14 +1561,25 @@
             }, 3000);
         }
 
-        function cleanupConnections() {
-            if (gameState.checkInterval) {
-                clearInterval(gameState.checkInterval);
-                gameState.checkInterval = null;
+        function updateNetworkStatus() {
+            if (!elements.networkStatus) return;
+            
+            if (gameState.networkManager) {
+                const peerCount = gameState.networkManager.peers.size;
+                if (peerCount > 0) {
+                    elements.networkStatus.innerHTML = `🌐 Network: ${peerCount} device(s) detected`;
+                } else {
+                    elements.networkStatus.innerHTML = '🌐 Network: Searching for devices...';
+                }
+            } else {
+                elements.networkStatus.innerHTML = '🌐 Network: Initializing...';
             }
-            if (gameState.roomExistsInterval) {
-                clearInterval(gameState.roomExistsInterval);
-                gameState.roomExistsInterval = null;
+        }
+
+        function cleanupConnections() {
+            if (gameState.syncInterval) {
+                clearInterval(gameState.syncInterval);
+                gameState.syncInterval = null;
             }
             
             gameState.players = {};
@@ -1244,21 +1588,31 @@
         }
 
         function cleanupOldRooms() {
-            const now = Date.now();
-            Object.keys(window.sharedRooms.rooms).forEach(code => {
-                const room = window.sharedRooms.rooms[code];
-                // Supprimer les salles inactives depuis plus de 5 minutes
-                if (now - room.lastUpdated > 5 * 60 * 1000) {
-                    delete window.sharedRooms.rooms[code];
-                }
-            });
+            // This is handled by the NetworkManager
         }
 
-        // Initialiser le jeu quand le DOM est chargé
+        // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', init);
         
-        // Nettoyer les anciennes salles périodiquement
-        setInterval(cleanupOldRooms, 60000);
+        // Handle page visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Page is hidden
+            } else {
+                // Page is visible again
+                updateNetworkStatus();
+            }
+        });
+        
+        // Handle beforeunload
+        window.addEventListener('beforeunload', () => {
+            if (gameState.isHost && gameState.roomCode) {
+                // Try to close room when host leaves
+                if (gameState.networkManager) {
+                    gameState.networkManager.closeRoom(gameState.roomCode);
+                }
+            }
+        });
     </script>
 </body>
 </html>
