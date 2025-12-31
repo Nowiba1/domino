@@ -100,6 +100,11 @@
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
         }
 
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+        }
+
         .code-input {
             display: flex;
             justify-content: center;
@@ -244,6 +249,10 @@
             background: linear-gradient(45deg, #2196F3, #1976D2);
         }
 
+        .message-warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+        }
+
         .loading {
             display: none;
             text-align: center;
@@ -278,6 +287,16 @@
             cursor: pointer;
             font-size: 14px;
             margin-top: 10px;
+        }
+
+        .host-indicator {
+            background: #e3f2fd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+            color: #1976d2;
+            font-weight: bold;
         }
 
         @media (max-width: 600px) {
@@ -331,6 +350,7 @@
                 <div style="margin-top: 40px; color: #777; font-size: 14px;">
                     <p>📱 Works on PC & Mobile</p>
                     <p>🌐 Same Local Network Required</p>
+                    <p>🔄 Refresh to clear all rooms</p>
                 </div>
             </div>
         </div>
@@ -345,9 +365,8 @@
                 <button class="copy-btn" id="copyCodeBtn">📋 Copy Code</button>
             </div>
             
-            <div class="loading" id="hostLoading">
-                <div class="spinner"></div>
-                <p>Waiting for players to join...</p>
+            <div class="host-indicator">
+                👑 You are the Host - Game will start automatically when all players are ready
             </div>
             
             <div class="player-list">
@@ -358,15 +377,15 @@
             </div>
             
             <div class="controls">
-                <button class="btn" id="backToMenuBtn1">← Back</button>
-                <button class="btn btn-secondary" id="startGameBtn" disabled>🚀 Start Game</button>
+                <button class="btn btn-danger" id="closeRoomBtn">🚪 Close Room</button>
+                <button class="btn btn-secondary" id="startGameBtn" disabled>🚀 Start Game (Auto)</button>
             </div>
         </div>
 
         <!-- Join Screen -->
         <div class="screen" id="joinScreen">
             <h2>Join Game</h2>
-            <p style="text-align: center; color: #666; margin-bottom: 30px;">Enter the 4-digit room code</p>
+            <p style="text-align: center; color: #666; margin-bottom: 30px;">Enter the 4-digit room code from host</p>
             
             <div class="code-input">
                 <input type="text" maxlength="1" class="code-digit" data-index="0">
@@ -389,7 +408,9 @@
         <!-- Lobby Screen -->
         <div class="screen" id="lobbyScreen">
             <h2>Room: <span id="currentRoomCode">----</span></h2>
-            <p style="text-align: center; color: #666; margin-bottom: 30px;">Waiting for host to start the game</p>
+            <div id="roomStatus" style="text-align: center; color: #666; margin-bottom: 30px;">
+                Waiting for host to start the game
+            </div>
             
             <div class="player-list">
                 <h3 id="lobbyPlayerCount">Players</h3>
@@ -399,14 +420,14 @@
             </div>
             
             <div class="controls">
-                <button class="btn" id="leaveRoomBtn">← Leave Room</button>
+                <button class="btn btn-danger" id="leaveRoomBtn">← Leave Room</button>
                 <button class="btn btn-secondary" id="readyBtn">✅ Ready</button>
             </div>
         </div>
 
         <!-- Game Screen -->
         <div class="screen" id="gameScreen">
-            <h2>Game Started!</h2>
+            <h2>Game Started! - Room: <span id="gameRoomCode">----</span></h2>
             
             <div class="score-board">
                 <div class="score-item">
@@ -441,7 +462,7 @@
             </div>
             
             <div class="controls">
-                <button class="btn" id="endGameBtn">🏁 End Game</button>
+                <button class="btn btn-danger" id="endGameBtn">🏁 End Game</button>
             </div>
         </div>
     </div>
@@ -450,6 +471,13 @@
     <div id="messageContainer"></div>
 
     <script>
+        // Système global de salles partagées (simulé pour le même réseau)
+        // Dans un vrai système, on utiliserait WebSockets ou WebRTC
+        window.sharedRooms = window.sharedRooms || {
+            rooms: {},
+            nextCheckId: 1
+        };
+
         // Game State
         const gameState = {
             currentScreen: 'menu',
@@ -458,41 +486,42 @@
             playerId: generatePlayerId(),
             playerName: generatePlayerName(),
             players: {},
-            connections: {},
-            dataChannel: null,
-            peerConnection: null,
+            readyPlayers: new Set(),
             gameActive: false,
             round: 1,
             timer: 60,
             scores: {},
-            readyPlayers: new Set(),
-            playerCount: 0
+            checkInterval: null,
+            roomExistsInterval: null
         };
 
-        // DOM Elements - will be initialized after DOM is loaded
+        // DOM Elements
         let elements = {};
 
         // Initialize
         function init() {
             initializeElements();
             setupEventListeners();
-            showMessage('Welcome! Connect to the same WiFi network to play.', 'info');
+            showMessage('Welcome! All devices must be on the same WiFi network.', 'info');
+            
+            // Nettoyer les anciennes salles au démarrage
+            cleanupOldRooms();
         }
 
         function initializeElements() {
             elements = {
                 hostBtn: document.getElementById('hostBtn'),
                 joinBtn: document.getElementById('joinBtn'),
-                backToMenuBtn1: document.getElementById('backToMenuBtn1'),
-                backToMenuBtn2: document.getElementById('backToMenuBtn2'),
                 startGameBtn: document.getElementById('startGameBtn'),
                 joinRoomBtn: document.getElementById('joinRoomBtn'),
                 readyBtn: document.getElementById('readyBtn'),
                 leaveRoomBtn: document.getElementById('leaveRoomBtn'),
                 endGameBtn: document.getElementById('endGameBtn'),
                 copyCodeBtn: document.getElementById('copyCodeBtn'),
+                closeRoomBtn: document.getElementById('closeRoomBtn'),
                 roomCodeDisplay: document.getElementById('roomCodeDisplay'),
                 currentRoomCode: document.getElementById('currentRoomCode'),
+                gameRoomCode: document.getElementById('gameRoomCode'),
                 hostPlayerList: document.getElementById('hostPlayerList'),
                 lobbyPlayerList: document.getElementById('lobbyPlayerList'),
                 gamePlayerList: document.getElementById('gamePlayerList'),
@@ -507,6 +536,7 @@
                 messageContainer: document.getElementById('messageContainer'),
                 hostPlayerCount: document.getElementById('hostPlayerCount'),
                 lobbyPlayerCount: document.getElementById('lobbyPlayerCount'),
+                roomStatus: document.getElementById('roomStatus'),
                 menuScreen: document.getElementById('menuScreen'),
                 hostScreen: document.getElementById('hostScreen'),
                 joinScreen: document.getElementById('joinScreen'),
@@ -519,12 +549,11 @@
             // Navigation
             elements.hostBtn.addEventListener('click', () => switchScreen('host'));
             elements.joinBtn.addEventListener('click', () => switchScreen('join'));
-            elements.backToMenuBtn1.addEventListener('click', () => switchScreen('menu'));
-            elements.backToMenuBtn2.addEventListener('click', () => switchScreen('menu'));
             
             // Host actions
             elements.startGameBtn.addEventListener('click', startGame);
             elements.copyCodeBtn.addEventListener('click', copyRoomCode);
+            elements.closeRoomBtn.addEventListener('click', closeRoom);
             
             // Join actions
             elements.joinRoomBtn.addEventListener('click', joinRoom);
@@ -551,26 +580,30 @@
                     if (e.key === 'Backspace' && !e.target.value && index > 0) {
                         elements.codeDigits[index - 1].focus();
                     }
+                    if (e.key === 'Enter') {
+                        joinRoom();
+                    }
                 });
-            });
-            
-            // Handle Enter key in code input
-            elements.codeDigits[3].addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    joinRoom();
-                }
             });
         }
 
         function switchScreen(screenName) {
-            Object.values(elements).forEach(el => {
-                if (el && el.classList && [
-                    'menuScreen', 'hostScreen', 'joinScreen', 'lobbyScreen', 'gameScreen'
-                ].some(name => el.id === name)) {
-                    el.classList.remove('active');
-                }
+            // Stop any existing intervals
+            if (gameState.checkInterval) {
+                clearInterval(gameState.checkInterval);
+                gameState.checkInterval = null;
+            }
+            if (gameState.roomExistsInterval) {
+                clearInterval(gameState.roomExistsInterval);
+                gameState.roomExistsInterval = null;
+            }
+            
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
             });
             
+            // Show target screen
             if (elements[`${screenName}Screen`]) {
                 elements[`${screenName}Screen`].classList.add('active');
             }
@@ -582,6 +615,9 @@
                 cleanupConnections();
             } else if (screenName === 'join') {
                 elements.codeDigits[0].focus();
+            } else if (screenName === 'lobby' && !gameState.isHost) {
+                // Vérifier périodiquement si la salle existe encore
+                checkRoomExists();
             }
         }
 
@@ -590,7 +626,7 @@
         }
 
         function generatePlayerId() {
-            return 'player_' + Math.random().toString(36).substr(2, 9);
+            return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
         }
 
         function generatePlayerName() {
@@ -607,25 +643,84 @@
                     id: gameState.playerId,
                     name: gameState.playerName,
                     ready: true,
+                    isHost: true,
                     score: 0
                 }
             };
             gameState.readyPlayers.clear();
             gameState.readyPlayers.add(gameState.playerId);
             
+            // Enregistrer la salle dans le système partagé
+            window.sharedRooms.rooms[gameState.roomCode] = {
+                hostId: gameState.playerId,
+                players: gameState.players,
+                readyPlayers: Array.from(gameState.readyPlayers),
+                createdAt: Date.now(),
+                lastUpdated: Date.now()
+            };
+            
             if (elements.roomCodeDisplay) {
                 elements.roomCodeDisplay.textContent = gameState.roomCode;
             }
-            if (elements.hostLoading) {
-                elements.hostLoading.classList.remove('active');
-            }
-            if (elements.startGameBtn) {
-                elements.startGameBtn.disabled = true;
-            }
             
             updatePlayerList();
-            
             showMessage(`Room created! Code: ${gameState.roomCode}`, 'success');
+            
+            // Démarrer la vérification périodique des joueurs
+            startRoomSync();
+        }
+
+        function startRoomSync() {
+            if (gameState.checkInterval) {
+                clearInterval(gameState.checkInterval);
+            }
+            
+            gameState.checkInterval = setInterval(() => {
+                if (!gameState.isHost || gameState.currentScreen !== 'host') return;
+                
+                // Mettre à jour la salle dans le système partagé
+                if (window.sharedRooms.rooms[gameState.roomCode]) {
+                    window.sharedRooms.rooms[gameState.roomCode] = {
+                        hostId: gameState.playerId,
+                        players: gameState.players,
+                        readyPlayers: Array.from(gameState.readyPlayers),
+                        createdAt: window.sharedRooms.rooms[gameState.roomCode].createdAt,
+                        lastUpdated: Date.now()
+                    };
+                }
+                
+                // Vérifier si tous les joueurs sont prêts
+                checkAllPlayersReady();
+                
+                // Synchroniser avec le système partagé (pour les joueurs qui rejoignent)
+                syncWithSharedRoom();
+                
+            }, 1000);
+        }
+
+        function syncWithSharedRoom() {
+            if (!gameState.isHost || !window.sharedRooms.rooms[gameState.roomCode]) return;
+            
+            const sharedRoom = window.sharedRooms.rooms[gameState.roomCode];
+            
+            // Mettre à jour la liste des joueurs à partir de la salle partagée
+            Object.keys(sharedRoom.players).forEach(playerId => {
+                if (!gameState.players[playerId]) {
+                    // Nouveau joueur détecté
+                    gameState.players[playerId] = sharedRoom.players[playerId];
+                    showMessage(`${sharedRoom.players[playerId].name} joined the room!`, 'info');
+                }
+            });
+            
+            // Mettre à jour les états "ready"
+            sharedRoom.readyPlayers.forEach(playerId => {
+                if (gameState.players[playerId]) {
+                    gameState.players[playerId].ready = true;
+                    gameState.readyPlayers.add(playerId);
+                }
+            });
+            
+            updatePlayerList();
         }
 
         function joinRoom() {
@@ -633,6 +728,19 @@
             
             if (code.length !== 4 || !/^\d+$/.test(code)) {
                 showMessage('Please enter a valid 4-digit code', 'error');
+                return;
+            }
+            
+            // Vérifier si la salle existe
+            if (!window.sharedRooms.rooms[code]) {
+                showMessage('Room not found. Make sure the host has created the room.', 'error');
+                return;
+            }
+            
+            // Vérifier si la salle est pleine
+            const roomPlayers = Object.keys(window.sharedRooms.rooms[code].players);
+            if (roomPlayers.length >= 8) {
+                showMessage('Room is full (max 8 players)', 'error');
                 return;
             }
             
@@ -651,24 +759,82 @@
                 elements.joinRoomBtn.disabled = true;
             }
             
-            // Simulate connection
+            // Simuler la connexion
             setTimeout(() => {
                 if (elements.joinLoading) {
                     elements.joinLoading.classList.remove('active');
                 }
-                switchScreen('lobby');
-                showMessage(`Joined room ${code}!`, 'success');
                 
-                // Add self to player list
-                gameState.players[gameState.playerId] = {
+                // S'enregistrer dans la salle partagée
+                const playerData = {
                     id: gameState.playerId,
                     name: gameState.playerName,
                     ready: false,
+                    isHost: false,
                     score: 0
                 };
                 
+                window.sharedRooms.rooms[code].players[gameState.playerId] = playerData;
+                window.sharedRooms.rooms[code].lastUpdated = Date.now();
+                
+                // Copier les données de la salle
+                gameState.players = JSON.parse(JSON.stringify(window.sharedRooms.rooms[code].players));
+                
+                switchScreen('lobby');
+                showMessage(`Joined room ${code}!`, 'success');
                 updatePlayerList();
-            }, 1500);
+                
+                // Démarrer la synchronisation avec l'hôte
+                startPlayerSync();
+                
+            }, 1000);
+        }
+
+        function startPlayerSync() {
+            if (gameState.checkInterval) {
+                clearInterval(gameState.checkInterval);
+            }
+            
+            gameState.checkInterval = setInterval(() => {
+                if (gameState.isHost || gameState.currentScreen !== 'lobby') return;
+                
+                const room = window.sharedRooms.rooms[gameState.roomCode];
+                if (!room) {
+                    showMessage('Room has been closed by host', 'error');
+                    leaveRoom();
+                    return;
+                }
+                
+                // Mettre à jour les données locales avec celles de la salle partagée
+                gameState.players = JSON.parse(JSON.stringify(room.players));
+                gameState.readyPlayers = new Set(room.readyPlayers || []);
+                
+                // Mettre à jour l'état "ready" du joueur local
+                if (gameState.players[gameState.playerId]) {
+                    gameState.players[gameState.playerId].ready = gameState.readyPlayers.has(gameState.playerId);
+                }
+                
+                updatePlayerList();
+                
+                // Vérifier si le jeu a commencé
+                if (room.gameStarted && gameState.currentScreen === 'lobby') {
+                    startGameFromHost();
+                }
+                
+            }, 1000);
+        }
+
+        function checkRoomExists() {
+            if (gameState.roomExistsInterval) {
+                clearInterval(gameState.roomExistsInterval);
+            }
+            
+            gameState.roomExistsInterval = setInterval(() => {
+                if (!window.sharedRooms.rooms[gameState.roomCode]) {
+                    showMessage('Room has been closed by host', 'error');
+                    leaveRoom();
+                }
+            }, 2000);
         }
 
         function toggleReady() {
@@ -681,19 +847,28 @@
                 gameState.readyPlayers.add(gameState.playerId);
                 if (elements.readyBtn) {
                     elements.readyBtn.textContent = '❌ Not Ready';
-                    elements.readyBtn.style.background = 'linear-gradient(45deg, #f44336, #d32f2f)';
+                    elements.readyBtn.classList.add('btn-danger');
+                    elements.readyBtn.classList.remove('btn-secondary');
                 }
             } else {
                 gameState.readyPlayers.delete(gameState.playerId);
                 if (elements.readyBtn) {
                     elements.readyBtn.textContent = '✅ Ready';
-                    elements.readyBtn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                    elements.readyBtn.classList.remove('btn-danger');
+                    elements.readyBtn.classList.add('btn-secondary');
                 }
+            }
+            
+            // Mettre à jour la salle partagée
+            if (window.sharedRooms.rooms[gameState.roomCode]) {
+                window.sharedRooms.rooms[gameState.roomCode].players[gameState.playerId].ready = player.ready;
+                window.sharedRooms.rooms[gameState.roomCode].readyPlayers = Array.from(gameState.readyPlayers);
+                window.sharedRooms.rooms[gameState.roomCode].lastUpdated = Date.now();
             }
             
             updatePlayerList();
             
-            // If host, check if all players are ready
+            // Si hôte, vérifier si tous les joueurs sont prêts
             if (gameState.isHost) {
                 checkAllPlayersReady();
             }
@@ -703,13 +878,18 @@
             if (!elements.startGameBtn) return;
             
             const allPlayers = Object.keys(gameState.players);
-            const allReady = allPlayers.length > 1 && 
+            const allReady = allPlayers.length >= 2 && 
                            allPlayers.every(id => gameState.readyPlayers.has(id));
             
             elements.startGameBtn.disabled = !allReady;
             
-            if (allReady) {
-                showMessage('All players ready!', 'success');
+            if (allReady && allPlayers.length >= 2) {
+                showMessage('All players ready! Starting game in 3 seconds...', 'success');
+                setTimeout(() => {
+                    if (gameState.currentScreen === 'host' && allReady) {
+                        startGame();
+                    }
+                }, 3000);
             }
         }
 
@@ -721,12 +901,40 @@
             gameState.timer = 60;
             gameState.scores = {};
             
-            // Initialize scores
+            // Initialiser les scores
+            Object.keys(gameState.players).forEach(playerId => {
+                gameState.scores[playerId] = 0;
+            });
+            
+            // Marquer le jeu comme commencé dans la salle partagée
+            if (window.sharedRooms.rooms[gameState.roomCode]) {
+                window.sharedRooms.rooms[gameState.roomCode].gameStarted = true;
+                window.sharedRooms.rooms[gameState.roomCode].lastUpdated = Date.now();
+            }
+            
+            switchScreen('game');
+            if (elements.gameRoomCode) {
+                elements.gameRoomCode.textContent = gameState.roomCode;
+            }
+            startGameTimer();
+            updateGameUI();
+        }
+
+        function startGameFromHost() {
+            gameState.gameActive = true;
+            gameState.round = 1;
+            gameState.timer = 60;
+            gameState.scores = {};
+            
+            // Initialiser les scores
             Object.keys(gameState.players).forEach(playerId => {
                 gameState.scores[playerId] = 0;
             });
             
             switchScreen('game');
+            if (elements.gameRoomCode) {
+                elements.gameRoomCode.textContent = gameState.roomCode;
+            }
             startGameTimer();
             updateGameUI();
         }
@@ -753,25 +961,25 @@
         function handleTargetClick() {
             if (!gameState.gameActive) return;
             
-            // Update score
+            // Mettre à jour le score
             if (!gameState.scores[gameState.playerId]) {
                 gameState.scores[gameState.playerId] = 0;
             }
             gameState.scores[gameState.playerId]++;
             
-            // Update UI
+            // Mettre à jour l'UI
             if (elements.yourClicks) {
                 elements.yourClicks.textContent = gameState.scores[gameState.playerId];
             }
             
-            // Visual feedback
+            // Feedback visuel
             if (elements.target) {
                 elements.target.style.transform = 'scale(0.9)';
                 setTimeout(() => {
                     elements.target.style.transform = 'scale(1)';
                 }, 100);
                 
-                // Move target randomly
+                // Déplacer la cible aléatoirement
                 const gameArea = document.querySelector('.game-area');
                 if (gameArea) {
                     const maxX = gameArea.clientWidth - 120;
@@ -792,7 +1000,7 @@
         function endRound() {
             gameState.gameActive = false;
             
-            // Determine winner
+            // Déterminer le gagnant
             let winner = null;
             let highestScore = 0;
             
@@ -803,10 +1011,10 @@
                 }
             });
             
-            // Show results
+            // Afficher les résultats
             showMessage(`Round ${gameState.round} ended! Winner: ${gameState.players[winner]?.name || 'No one'}`, 'success');
             
-            // If host, decide next round
+            // Si hôte, décider du prochain round
             if (gameState.isHost) {
                 setTimeout(() => {
                     if (confirm('Start next round?')) {
@@ -814,7 +1022,7 @@
                         gameState.gameActive = true;
                         gameState.timer = 60;
                         
-                        // Reset scores for new round
+                        // Réinitialiser les scores pour le nouveau round
                         Object.keys(gameState.scores).forEach(playerId => {
                             gameState.scores[playerId] = 0;
                         });
@@ -832,15 +1040,49 @@
             showMessage('Game ended!', 'info');
             
             if (gameState.isHost) {
+                // Retirer le drapeau de jeu commencé
+                if (window.sharedRooms.rooms[gameState.roomCode]) {
+                    window.sharedRooms.rooms[gameState.roomCode].gameStarted = false;
+                }
                 switchScreen('host');
             } else {
                 switchScreen('lobby');
             }
         }
 
+        function closeRoom() {
+            if (gameState.gameActive) {
+                if (!confirm('Are you sure? This will end the game for all players.')) {
+                    return;
+                }
+                endGame();
+            }
+            
+            // Supprimer la salle du système partagé
+            if (window.sharedRooms.rooms[gameState.roomCode]) {
+                delete window.sharedRooms.rooms[gameState.roomCode];
+            }
+            
+            cleanupConnections();
+            switchScreen('menu');
+            showMessage('Room closed', 'info');
+        }
+
         function leaveRoom() {
             if (gameState.gameActive) {
                 endGame();
+            }
+            
+            // Retirer le joueur de la salle partagée
+            if (window.sharedRooms.rooms[gameState.roomCode]) {
+                delete window.sharedRooms.rooms[gameState.roomCode].players[gameState.playerId];
+                window.sharedRooms.rooms[gameState.roomCode].lastUpdated = Date.now();
+                
+                // Mettre à jour la liste des joueurs prêts
+                const readyIndex = window.sharedRooms.rooms[gameState.roomCode].readyPlayers.indexOf(gameState.playerId);
+                if (readyIndex > -1) {
+                    window.sharedRooms.rooms[gameState.roomCode].readyPlayers.splice(readyIndex, 1);
+                }
             }
             
             cleanupConnections();
@@ -850,15 +1092,19 @@
 
         function updatePlayerList() {
             const playerCount = Object.keys(gameState.players).length;
+            const readyCount = gameState.readyPlayers.size;
             
-            // Update host player list
-            if (elements.hostPlayerList) {
+            // Mettre à jour la liste des joueurs de l'hôte
+            if (elements.hostPlayerList && elements.hostPlayerCount) {
                 elements.hostPlayerList.innerHTML = '';
                 Object.values(gameState.players).forEach(player => {
                     const playerEl = document.createElement('div');
                     playerEl.className = 'player-item';
                     playerEl.innerHTML = `
-                        <div class="player-name">${player.name}</div>
+                        <div class="player-name">
+                            ${player.isHost ? '👑 ' : ''}${player.name}
+                            ${player.id === gameState.playerId ? '(You)' : ''}
+                        </div>
                         <div class="player-status ${player.ready ? 'status-ready' : 'status-waiting'}">
                             ${player.ready ? 'Ready' : 'Waiting'}
                         </div>
@@ -866,20 +1112,28 @@
                     elements.hostPlayerList.appendChild(playerEl);
                 });
                 
-                // Update player count on host screen
-                if (elements.hostPlayerCount) {
-                    elements.hostPlayerCount.textContent = `Players (${playerCount}/8)`;
+                elements.hostPlayerCount.textContent = `Players (${playerCount}/8) - Ready: ${readyCount}/${playerCount}`;
+                
+                // Mettre à jour le statut de la salle
+                if (elements.roomStatus && !gameState.isHost) {
+                    elements.roomStatus.innerHTML = `
+                        <div>Waiting for all players to be ready</div>
+                        <div style="font-size: 14px; margin-top: 5px;">Ready: ${readyCount}/${playerCount}</div>
+                    `;
                 }
             }
             
-            // Update lobby player list
-            if (elements.lobbyPlayerList) {
+            // Mettre à jour la liste des joueurs du lobby
+            if (elements.lobbyPlayerList && elements.lobbyPlayerCount) {
                 elements.lobbyPlayerList.innerHTML = '';
                 Object.values(gameState.players).forEach(player => {
                     const playerEl = document.createElement('div');
                     playerEl.className = 'player-item';
                     playerEl.innerHTML = `
-                        <div class="player-name">${player.name} ${player.id === gameState.playerId ? '(You)' : ''}</div>
+                        <div class="player-name">
+                            ${player.isHost ? '👑 ' : ''}${player.name}
+                            ${player.id === gameState.playerId ? '(You)' : ''}
+                        </div>
                         <div class="player-status ${player.ready ? 'status-ready' : 'status-waiting'}">
                             ${player.ready ? 'Ready' : 'Waiting'}
                         </div>
@@ -887,22 +1141,21 @@
                     elements.lobbyPlayerList.appendChild(playerEl);
                 });
                 
-                // Update lobby player count
-                if (elements.lobbyPlayerCount) {
-                    elements.lobbyPlayerCount.textContent = `Players (${playerCount}/8)`;
-                }
+                elements.lobbyPlayerCount.textContent = `Players (${playerCount}/8) - Ready: ${readyCount}/${playerCount}`;
             }
             
-            // Update ready button if not host
-            if (!gameState.isHost && elements.readyBtn) {
+            // Mettre à jour le bouton Ready
+            if (elements.readyBtn && !gameState.isHost) {
                 const player = gameState.players[gameState.playerId];
                 if (player) {
                     if (player.ready) {
                         elements.readyBtn.textContent = '❌ Not Ready';
-                        elements.readyBtn.style.background = 'linear-gradient(45deg, #f44336, #d32f2f)';
+                        elements.readyBtn.classList.add('btn-danger');
+                        elements.readyBtn.classList.remove('btn-secondary');
                     } else {
                         elements.readyBtn.textContent = '✅ Ready';
-                        elements.readyBtn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                        elements.readyBtn.classList.remove('btn-danger');
+                        elements.readyBtn.classList.add('btn-secondary');
                     }
                 }
             }
@@ -911,27 +1164,27 @@
         function updateGameUI() {
             const playerCount = Object.keys(gameState.players).length;
             
-            // Update player count
+            // Mettre à jour le nombre de joueurs
             if (elements.playerCount) {
                 elements.playerCount.textContent = playerCount;
             }
             
-            // Update round count
+            // Mettre à jour le round
             if (elements.roundCount) {
                 elements.roundCount.textContent = gameState.round;
             }
             
-            // Update timer
+            // Mettre à jour le timer
             if (elements.timer) {
                 elements.timer.textContent = gameState.timer;
             }
             
-            // Update your clicks
+            // Mettre à jour vos clics
             if (elements.yourClicks) {
                 elements.yourClicks.textContent = gameState.scores[gameState.playerId] || 0;
             }
             
-            // Update player scores in game
+            // Mettre à jour les scores des joueurs dans le jeu
             if (elements.gamePlayerList) {
                 elements.gamePlayerList.innerHTML = '';
                 Object.values(gameState.players).forEach(player => {
@@ -939,7 +1192,10 @@
                     const playerEl = document.createElement('div');
                     playerEl.className = 'player-item';
                     playerEl.innerHTML = `
-                        <div class="player-name">${player.name} ${player.id === gameState.playerId ? '(You)' : ''}</div>
+                        <div class="player-name">
+                            ${player.isHost ? '👑 ' : ''}${player.name}
+                            ${player.id === gameState.playerId ? '(You)' : ''}
+                        </div>
                         <div style="font-size: 24px; font-weight: bold; color: #667eea;">
                             ${score}
                         </div>
@@ -964,7 +1220,7 @@
             
             elements.messageContainer.appendChild(message);
             
-            // Remove message after 3 seconds
+            // Supprimer le message après 3 secondes
             setTimeout(() => {
                 message.style.opacity = '0';
                 message.style.transform = 'translateX(100%)';
@@ -973,13 +1229,36 @@
         }
 
         function cleanupConnections() {
+            if (gameState.checkInterval) {
+                clearInterval(gameState.checkInterval);
+                gameState.checkInterval = null;
+            }
+            if (gameState.roomExistsInterval) {
+                clearInterval(gameState.roomExistsInterval);
+                gameState.roomExistsInterval = null;
+            }
+            
             gameState.players = {};
             gameState.readyPlayers.clear();
             gameState.playerCount = 0;
         }
 
-        // Initialize game when DOM is loaded
+        function cleanupOldRooms() {
+            const now = Date.now();
+            Object.keys(window.sharedRooms.rooms).forEach(code => {
+                const room = window.sharedRooms.rooms[code];
+                // Supprimer les salles inactives depuis plus de 5 minutes
+                if (now - room.lastUpdated > 5 * 60 * 1000) {
+                    delete window.sharedRooms.rooms[code];
+                }
+            });
+        }
+
+        // Initialiser le jeu quand le DOM est chargé
         document.addEventListener('DOMContentLoaded', init);
+        
+        // Nettoyer les anciennes salles périodiquement
+        setInterval(cleanupOldRooms, 60000);
     </script>
 </body>
 </html>
