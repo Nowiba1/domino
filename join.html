@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Dominoes - Join Room</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="pcv"></canvas>
+
+<!-- JOIN ROOM SCREEN -->
+<div id="ML" class="sc">
+  <div class="logo">
+    <img src="logo.svg" alt="Dominoes" class="logo-img-main" style="width:130px;">
+  </div>
+  <div class="lobby-box">
+    <h2>🚪 Join a Game</h2>
+    <p style="text-align:center;font-size:.78rem;color:var(--txt-dim);margin-bottom:8px">Enter the 4-letter code shared by the host</p>
+    <input class="input-field" id="room-input" type="text" placeholder="Enter Room Code (e.g. ABCD)" maxlength="4" autocomplete="off" style="text-align:center;font-size:1.3rem;letter-spacing:.2em;">
+    <button class="lobby-btn" id="btn-join" onclick="mpJoinRoom()" style="width:100%">🚪 Join Room</button>
+    <div class="status-msg" id="lobby-status">Waiting for room code...</div>
+    <button class="lobby-btn secondary" onclick="goToMenu()" style="width:100%;margin-top:8px">↩ Back to Menu</button>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toasts"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getDatabase, ref, set, get, update, onValue, off, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyBaNjHmi-VlW8aFDDVN38OJkQCShYY2sFg",
+    authDomain: "dominos-ftw.firebaseapp.com",
+    databaseURL: "https://dominos-ftw-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "dominos-ftw",
+    storageBucket: "dominos-ftw.firebasestorage.app",
+    messagingSenderId: "476741872461",
+    appId: "1:476741872461:web:3dc979b05a6175eadda504",
+    measurementId: "G-1TBL91595F"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  
+  window.firebaseDB = db;
+  window.firebaseRef = ref;
+  window.firebaseSet = set;
+  window.firebaseGet = get;
+  window.firebaseUpdate = update;
+  window.firebaseOnValue = onValue;
+  window.firebaseOff = off;
+  window.firebaseServerTimestamp = serverTimestamp;
+  window.firebaseOnDisconnect = onDisconnect;
+  
+  console.log('🔥 Firebase initialized - Join Room');
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>
