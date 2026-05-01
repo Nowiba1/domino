@@ -2085,11 +2085,22 @@ function mpCreateRoom() {
 
   window.firebaseSet(roomRef, roomData).then(function() {
     mpRoomId = roomCode;
-    document.getElementById('room-code-display').textContent = roomCode;
-    document.getElementById('lobby-status').textContent = 'Room created! Share the code: ' + roomCode;
-    document.getElementById('btn-ready').disabled = false;
-    document.getElementById('btn-start').disabled = false;
-    document.getElementById('copy-btn').style.display = 'inline-block';
+    var roomCodeDisplay = document.getElementById('room-code-display');
+    if (roomCodeDisplay) {
+      roomCodeDisplay.innerHTML = roomCode + '<button class="copy-btn" onclick="copyRoomCode()" id="copy-btn" style="display:inline-block">📋</button>';
+    }
+    var lobbyStatus = document.getElementById('lobby-status');
+    if (lobbyStatus) {
+      lobbyStatus.textContent = 'Room created! Share the code: ' + roomCode;
+    }
+    var btnReady = document.getElementById('btn-ready');
+    if (btnReady) {
+      btnReady.disabled = false;
+    }
+    var btnStart = document.getElementById('btn-start');
+    if (btnStart) {
+      btnStart.disabled = false;
+    }
     window.location.hash = 'room=' + roomCode;
     mpListenForPlayers(roomCode);
     toast('🎲 Room ' + roomCode + ' created!');
