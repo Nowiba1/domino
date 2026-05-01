@@ -2213,6 +2213,15 @@ function mpUpdateLobbyUI(data) {
   if (roomCodeDisplay) {
     roomCodeDisplay.innerHTML = (data.code || '----') + '<button class="copy-btn" onclick="copyRoomCode()" id="copy-btn" style="display:inline-block">📋</button>';
   }
+  var lobbyStatus = document.getElementById('lobby-status');
+  if (lobbyStatus && data.hostId && data.players) {
+    var playerCount = Object.keys(data.players).length;
+    if (playerCount >= 2) {
+      lobbyStatus.textContent = playerCount + ' players in room. Host can start the game!';
+    } else {
+      lobbyStatus.textContent = 'Waiting for more players...';
+    }
+  }
 }
 
 function mpToggleReady() {
@@ -2500,7 +2509,10 @@ function goMenu() {
   document.getElementById('spectate-list-modal').classList.add('off');
   window.location.hash = '';
   isSpectator = false;
-  document.getElementById('ph-label').textContent = 'YOUR HAND — tap a glowing tile to play';
+  var phLabel = document.getElementById('ph-label');
+  if (phLabel) {
+    phLabel.textContent = 'YOUR HAND — tap a glowing tile to play';
+  }
 }
 
 function startGame(numBots) {
@@ -2521,7 +2533,10 @@ function startGame(numBots) {
   document.getElementById('ML').classList.add('off');
   document.getElementById('emoji-picker').classList.add('off');
   document.getElementById('rematch-bar').classList.add('off');
-  document.getElementById('ph-label').textContent = 'YOUR HAND — tap a glowing tile to play';
+  var phLabel = document.getElementById('ph-label');
+  if (phLabel) {
+    phLabel.textContent = 'YOUR HAND — tap a glowing tile to play';
+  }
   initGame(numBots, false, 'draw');
   renderBotZones();
   renderBoard();
