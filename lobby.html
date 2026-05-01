@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Dominoes - Lobby</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="pcv"></canvas>
+
+<!-- MULTIPLAYER LOBBY -->
+<div id="ML" class="sc">
+  <div class="logo">
+    <img src="logo.svg" alt="Dominoes" class="logo-img-main" style="width:130px;">
+  </div>
+  <div class="lobby-box">
+    <h2>🌐 Game Lobby</h2>
+    <div class="room-code" id="room-code-display">
+      ----
+      <button class="copy-btn" onclick="copyRoomCode()" id="copy-btn" style="display:none">📋</button>
+    </div>
+    <div class="room-players" id="room-players">
+      <div class="room-player">Waiting for players...</div>
+    </div>
+    <div class="status-msg" id="lobby-status">Share the room code with friends</div>
+
+    <!-- Auto-start toggle -->
+    <div class="auto-start-row">
+      <span>Auto-start when all ready</span>
+      <div class="toggle-switch" id="auto-start-toggle" onclick="toggleAutoStart()"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="lobby-btn" id="btn-ready" onclick="mpToggleReady()">✅ Ready Up</button>
+    </div>
+    <div class="btn-row">
+      <button class="lobby-btn secondary" id="btn-start" onclick="mpStartGame()" disabled>▶ Start Game</button>
+    </div>
+    <button class="lobby-btn secondary" onclick="mpLeaveLobby()" style="width:100%">↩ Leave Lobby</button>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toasts"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getDatabase, ref, set, get, update, onValue, off, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyBaNjHmi-VlW8aFDDVN38OJkQCShYY2sFg",
+    authDomain: "dominos-ftw.firebaseapp.com",
+    databaseURL: "https://dominos-ftw-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "dominos-ftw",
+    storageBucket: "dominos-ftw.firebasestorage.app",
+    messagingSenderId: "476741872461",
+    appId: "1:476741872461:web:3dc979b05a6175eadda504",
+    measurementId: "G-1TBL91595F"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  
+  window.firebaseDB = db;
+  window.firebaseRef = ref;
+  window.firebaseSet = set;
+  window.firebaseGet = get;
+  window.firebaseUpdate = update;
+  window.firebaseOnValue = onValue;
+  window.firebaseOff = off;
+  window.firebaseServerTimestamp = serverTimestamp;
+  window.firebaseOnDisconnect = onDisconnect;
+  
+  console.log('🔥 Firebase initialized - Lobby');
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>
