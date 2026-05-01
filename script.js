@@ -581,6 +581,10 @@ function showMenu() {
 }
 
 function checkPageContext() {
+  // Prevent redirect loops
+  if (window._pageContextChecked) return;
+  window._pageContextChecked = true;
+  
   var path = window.location.pathname;
   var params = new URLSearchParams(window.location.search);
   
