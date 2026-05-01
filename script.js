@@ -2002,23 +2002,58 @@ function openMultiplayerLobby(variant) {
   SFX.click();
   document.getElementById('MS').classList.add('off');
   document.getElementById('ML').classList.remove('off');
-  document.getElementById('room-code-display').textContent = '----';
-  document.getElementById('room-players').innerHTML = '<div class="room-player">Create or join a room</div>';
-  document.getElementById('lobby-status').textContent = 'Create a room or join an existing one';
-  document.getElementById('btn-ready').disabled = true;
-  document.getElementById('btn-start').disabled = true;
-  document.getElementById('room-input').value = '';
-  document.getElementById('copy-btn').style.display = 'none';
+  
+  var roomCodeDisplay = document.getElementById('room-code-display');
+  if (roomCodeDisplay) {
+    roomCodeDisplay.innerHTML = '----<button class="copy-btn" onclick="copyRoomCode()" id="copy-btn" style="display:none">📋</button>';
+  }
+  
+  var roomPlayers = document.getElementById('room-players');
+  if (roomPlayers) {
+    roomPlayers.innerHTML = '<div class="room-player">Create or join a room</div>';
+  }
+  
+  var lobbyStatus = document.getElementById('lobby-status');
+  if (lobbyStatus) {
+    lobbyStatus.textContent = 'Create a room or join an existing one';
+  }
+  
+  var btnReady = document.getElementById('btn-ready');
+  if (btnReady) {
+    btnReady.disabled = true;
+  }
+  
+  var btnStart = document.getElementById('btn-start');
+  if (btnStart) {
+    btnStart.disabled = true;
+  }
+  
+  var roomInput = document.getElementById('room-input');
+  if (roomInput) {
+    roomInput.value = '';
+  }
+  
+  var copyBtn = document.getElementById('copy-btn');
+  if (copyBtn) {
+    copyBtn.style.display = 'none';
+  }
+  
   if (!mpPlayerId) {
     mpPlayerId = PLAYER_ID || ('player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
   }
+  
   mpVariant = variant || 'draw';
+  
   var subtitles = {
     draw: 'Classic Draw Game',
     block: 'Block Game — No Drawing',
     allfives: 'All Fives — Score During Play'
   };
-  document.getElementById('ml-subtitle').textContent = subtitles[mpVariant] || 'Online Multiplayer';
+  
+  var mlSubtitle = document.getElementById('ml-subtitle');
+  if (mlSubtitle) {
+    mlSubtitle.textContent = subtitles[mpVariant] || 'Online Multiplayer';
+  }
 }
 
 function mpCreateRoom() {
