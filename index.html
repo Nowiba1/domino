@@ -186,10 +186,10 @@ const firebaseConfig = {
   
   console.log('🔥 Firebase initialized for Dominoes multiplayer');
 
-  // Register Service Worker
+   // Register Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-      navigator.serviceWorker.register('./sw.js') {
+      navigator.serviceWorker.register('./sw.js').then(function(registration) {
         console.log('📦 Service Worker registered with scope:', registration.scope);
       }).catch(function(error) {
         console.log('❌ Service Worker registration failed:', error);
