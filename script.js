@@ -2142,11 +2142,22 @@ function mpJoinRoom() {
     };
     window.firebaseUpdate(roomRef, updateData).then(function() {
       mpRoomId = code;
-      document.getElementById('room-code-display').textContent = code;
-      document.getElementById('lobby-status').textContent = 'Joined room ' + code;
-      document.getElementById('btn-ready').disabled = false;
-      document.getElementById('btn-start').disabled = true;
-      document.getElementById('copy-btn').style.display = 'inline-block';
+      var roomCodeDisplay = document.getElementById('room-code-display');
+      if (roomCodeDisplay) {
+        roomCodeDisplay.innerHTML = code + '<button class="copy-btn" onclick="copyRoomCode()" id="copy-btn" style="display:inline-block">📋</button>';
+      }
+      var lobbyStatus = document.getElementById('lobby-status');
+      if (lobbyStatus) {
+        lobbyStatus.textContent = 'Joined room ' + code;
+      }
+      var btnReady = document.getElementById('btn-ready');
+      if (btnReady) {
+        btnReady.disabled = false;
+      }
+      var btnStart = document.getElementById('btn-start');
+      if (btnStart) {
+        btnStart.disabled = true;
+      }
       window.location.hash = 'room=' + code;
       mpListenForPlayers(code);
       toast('🚪 Joined room ' + code + '!');
