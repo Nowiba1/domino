@@ -602,14 +602,17 @@ function checkPageContext() {
     }
   }
   
-  // If on lobby.html, check for room param
+   // If on lobby.html, check for room param or auto-create
   if (path.includes('lobby.html')) {
     var lobbyRoom = params.get('room');
     var lobbyVariant = params.get('variant') || 'draw';
+    mpVariant = lobbyVariant;
     if (lobbyRoom) {
       mpRoomId = lobbyRoom;
-      mpVariant = lobbyVariant;
       setTimeout(function() { rejoinLobby(lobbyRoom); }, 500);
+    } else {
+      if (!mpPlayerId) mpPlayerId = PLAYER_ID || ('player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
+      setTimeout(function() { mpCreateRoom(); }, 400);
     }
     return;
   }
