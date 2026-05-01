@@ -2266,9 +2266,38 @@ function renderDeco() { var el = document.getElementById('deco'); if (!el) retur
 /* ── LOADING ── */
 (function() {
   initUsername();
+  
+  // Only run loading bar on index.html
+  var path = window.location.pathname;
+  if (!path.includes('index.html') && path !== '/' && path !== '') {
+    // Not on index page, skip loading screen
+    var ls = document.getElementById('LS');
+    if (ls) ls.classList.add('off');
+    return;
+  }
+  
   var bar = document.getElementById('lbar'), txt = document.getElementById('ltxt');
   if (!bar || !txt) return;
   var msgs = ['Shuffling tiles…', 'Polishing the felt…', 'Waking the bots…', 'Counting pips…', 'Ready!'];
   var pct = 0;
-  var iv = setInterval(function() { pct += 5 + Math.random() * 17; if (pct > 100) pct = 100; bar.style.width = pct + '%'; txt.textContent = msgs[Math.min(4, Math.floor(pct / 25))]; if (pct >= 100) { clearInterval(iv); setTimeout(function() { if (!USERNAME) {} else { var ls = document.getElementById('LS'); if (ls) ls.classList.add('off'); var ms = document.getElementById('MS'); if (ms) ms.classList.remove('off'); renderDeco(); } }, 340); } }, 58);
+  var iv = setInterval(function() {
+    pct += 5 + Math.random() * 17;
+    if (pct > 100) pct = 100;
+    bar.style.width = pct + '%';
+    txt.textContent = msgs[Math.min(4, Math.floor(pct / 25))];
+    if (pct >= 100) {
+      clearInterval(iv);
+      setTimeout(function() {
+        if (!USERNAME) {
+          // Wait for username
+        } else {
+          var ls2 = document.getElementById('LS');
+          if (ls2) ls2.classList.add('off');
+          var ms = document.getElementById('MS');
+          if (ms) ms.classList.remove('off');
+          renderDeco();
+        }
+      }, 340);
+    }
+  }, 58);
 })();
