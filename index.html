@@ -82,11 +82,48 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
 .mbg{margin-left:auto;font-size:.6rem;letter-spacing:.1em;flex-shrink:0;
   background:rgba(201,168,76,.15);color:var(--gold-l);
   border:1px solid rgba(201,168,76,.26);border-radius:18px;padding:2px 8px}
+.mbtn.mp-btn{background:linear-gradient(135deg,rgba(26,60,118,.4),rgba(15,30,60,.6));
+  border-color:rgba(91,158,232,.3)}
+.mbtn.mp-btn:hover{border-color:rgba(91,158,232,.6);box-shadow:0 5px 22px rgba(0,0,0,.42)}
 .mfoot{display:flex;justify-content:center;gap:10px;position:relative;z-index:1}
 .mfbtn{background:rgba(0,0,0,.36);border:1px solid rgba(255,255,255,.1);border-radius:8px;
   color:var(--txt-dim);font-size:.73rem;font-family:var(--U);padding:6px 14px;cursor:pointer;
   transition:all var(--ta);display:flex;align-items:center;gap:6px}
 .mfbtn:hover{border-color:rgba(201,168,76,.35);color:var(--txt-gold)}
+
+/* ── MULTIPLAYER LOBBY ── */
+#ML{flex-direction:column;gap:14px;
+  background:radial-gradient(ellipse at 50% 35%,#1f4a6a 0%,#0d2a40 50%,#040a0d 100%)}
+#ML::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 40% 26% at 16% 16%,rgba(91,158,232,.08) 0%,transparent 55%)}
+#ML::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.026) 3px,rgba(0,0,0,.026) 4px)}
+.lobby-box{background:rgba(3,14,26,.76);border:1px solid rgba(91,158,232,.2);border-radius:var(--r-lg);
+  padding:24px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  width:min(420px,93vw);display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;
+  box-shadow:var(--sh-lg),inset 0 1px 0 rgba(255,255,255,.04);animation:pIn .55s ease .1s both}
+.lobby-box h2{font-family:var(--F);font-size:1.3rem;color:#5bbeff;text-align:center;margin-bottom:4px}
+.room-code{font-family:var(--F);font-size:2.5rem;color:var(--gold-l);text-align:center;
+  letter-spacing:.15em;background:rgba(0,0,0,.3);border-radius:10px;padding:10px;
+  border:2px dashed rgba(201,168,76,.25)}
+.room-players{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.room-player{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;padding:8px 12px;font-size:.78rem;color:var(--txt-dim);
+  display:flex;align-items:center;gap:6px}
+.room-player.joined{color:var(--txt);border-color:rgba(91,158,232,.3)}
+.input-field{width:100%;padding:10px;background:rgba(0,0,0,.3);border:1px solid rgba(91,158,232,.25);
+  border-radius:8px;color:var(--txt);font-size:.85rem;font-family:var(--U)}
+.input-field::placeholder{color:var(--txt-dim)}
+.btn-row{display:flex;gap:8px}
+.lobby-btn{flex:1;padding:11px;border:none;border-radius:9px;font-size:.85rem;
+  font-family:var(--U);font-weight:600;cursor:pointer;transition:all var(--ta);
+  background:linear-gradient(135deg,#2d6a9e,#1a3d5c);
+  border:1px solid rgba(91,158,232,.3);color:#e0ecf8}
+.lobby-btn:hover{background:linear-gradient(135deg,#3d8ac8,#2d6a9e);transform:translateY(-2px)}
+.lobby-btn.secondary{background:rgba(0,0,0,.3);border-color:rgba(255,255,255,.15);color:var(--txt-dim)}
+.lobby-btn.secondary:hover{background:rgba(0,0,0,.5);color:var(--txt)}
+.status-msg{text-align:center;font-size:.75rem;color:rgba(150,180,200,.6);min-height:20px}
+.copied{color:#5bbeff!important}
 
 /* ── HUD ── */
 #hud{position:fixed;top:0;left:0;right:0;height:50px;
@@ -108,6 +145,8 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
 .chip .cs{background:rgba(0,0,0,.28);border-radius:10px;
   padding:1px 5px;font-size:.63rem;color:var(--gold-l);font-weight:600}
 .chip .ct{font-size:.58rem;color:rgba(160,155,132,.48)}
+.chip.mp-chip{background:rgba(91,158,232,.12);border-color:rgba(91,158,232,.2)}
+.chip.mp-chip .cs{color:#5bbeff}
 .hbtns{display:flex;gap:5px;flex-shrink:0}
 .hbtn{border-radius:7px;padding:4px 10px;font-size:.7rem;cursor:pointer;
   font-family:var(--U);font-weight:600;transition:all var(--ta);white-space:nowrap;border:1px solid}
@@ -116,9 +155,6 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
 #hbtn-snd{background:rgba(36,36,36,.74);border-color:rgba(110,108,86,.28);
   color:var(--txt-dim);min-width:32px;text-align:center}
 #hbtn-snd:hover{background:rgba(56,56,52,.9);color:var(--txt)}
-#hbtn-zoom-in,#hbtn-zoom-out{background:rgba(30,70,44,.74);border-color:rgba(80,160,100,.28);
-  color:rgba(180,230,195,.8);min-width:30px;text-align:center;font-size:.85rem;padding:4px 8px}
-#hbtn-zoom-in:hover,#hbtn-zoom-out:hover{background:rgba(40,100,60,.9);color:#fff}
 
 /* ── GAME SCREEN ── */
 #GS{flex-direction:column;overflow:hidden;
@@ -444,10 +480,40 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
       <span><span class="mt">1 vs 4 — Big Table</span><span class="md">Maximum chaos · 5 tiles each</span></span>
       <span class="mbg">5 Players</span>
     </button>
+    <div class="godiv" style="margin:4px 0"></div>
+    <div class="mlbl">Multiplayer</div>
+    <button class="mbtn mp-btn" onclick="openMultiplayerLobby()">
+      <span class="mi">🌐</span>
+      <span><span class="mt">Online Multiplayer</span><span class="md">Play with friends in real-time</span></span>
+      <span class="mbg" style="background:rgba(91,158,232,.15);border-color:rgba(91,158,232,.3);color:#5bbeff">LIVE</span>
+    </button>
   </div>
   <div class="mfoot">
     <button class="mfbtn" id="ms-snd" onclick="toggleSound()">🔊 Sound On</button>
     <button class="mfbtn" onclick="openRules()">📖 Rules</button>
+  </div>
+</div>
+
+<!-- MULTIPLAYER LOBBY -->
+<div id="ML" class="sc off">
+  <div class="logo"><h1>DOMINOES</h1><p>Online Multiplayer</p></div>
+  <div class="lobby-box">
+    <h2>🌐 Join or Create a Game</h2>
+    <div class="room-code" id="room-code-display">----</div>
+    <div class="room-players" id="room-players">
+      <div class="room-player">Waiting for players...</div>
+    </div>
+    <div class="status-msg" id="lobby-status">Create a room or join an existing one</div>
+    <input class="input-field" id="room-input" type="text" placeholder="Enter Room Code (4 letters)" maxlength="4" autocomplete="off">
+    <div class="btn-row">
+      <button class="lobby-btn" id="btn-create" onclick="mpCreateRoom()">🎲 Create Room</button>
+      <button class="lobby-btn" id="btn-join" onclick="mpJoinRoom()">🚪 Join Room</button>
+    </div>
+    <div class="btn-row">
+      <button class="lobby-btn secondary" id="btn-ready" onclick="mpToggleReady()" disabled>✅ Ready Up</button>
+      <button class="lobby-btn secondary" id="btn-start" onclick="mpStartGame()" disabled>▶ Start Game</button>
+    </div>
+    <button class="lobby-btn secondary" onclick="mpLeaveLobby()" style="width:100%">↩ Back to Menu</button>
   </div>
 </div>
 
@@ -477,14 +543,12 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
     <div id="bz2" class="bz" style="display:none"></div>
     <div id="bz3" class="bz" style="display:none"></div>
 
-    <!-- Zoomable/pannable board viewport -->
     <div id="bvp">
       <div id="bcanvas">
         <div id="board"></div>
       </div>
     </div>
 
-    <!-- Zoom controls -->
     <div id="zoom-ctrl">
       <button class="zb" onclick="doZoom(1.2)" title="Zoom In">+</button>
       <div id="zoom-pct">100%</div>
@@ -537,14 +601,50 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
 
 <div id="toasts"></div>
 
+<!-- FIREBASE SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getDatabase, ref, set, get, update, onValue, off, push, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyBaNjHmi-VlW8aFDDVN38OJkQCShYY2sFg",
+    authDomain: "dominos-ftw.firebaseapp.com",
+    projectId: "dominos-ftw",
+    storageBucket: "dominos-ftw.firebasestorage.app",
+    messagingSenderId: "476741872461",
+    appId: "1:476741872461:web:3dc979b05a6175eadda504",
+    measurementId: "G-1TBL91595F"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  
+  // Expose Firebase to global scope for multiplayer functions
+  window.firebaseDB = db;
+  window.firebaseRef = ref;
+  window.firebaseSet = set;
+  window.firebaseGet = get;
+  window.firebaseUpdate = update;
+  window.firebaseOnValue = onValue;
+  window.firebaseOff = off;
+  window.firebasePush = push;
+  window.firebaseServerTimestamp = serverTimestamp;
+  window.firebaseOnDisconnect = onDisconnect;
+  
+  console.log('🔥 Firebase initialized for Dominoes multiplayer');
+</script>
+
 <script>
 /* ================================================================
-   DOMINOES — Complete Professional Edition
-   Board Layout: Real snake pattern — Right → Down → Left → Up → …
-   Doubles: perpendicular to chain direction
-   Features: pinch-zoom, wheel-zoom, drag-pan, touch support,
-             snake layout, stats tracking, sound, animations
+   DOMINOES — Complete Professional Edition with Multiplayer
+   All original features preserved + Firebase real-time multiplayer
 ================================================================ */
+
+/* ── CENTER COORDINATES (defined once, used globally) ── */
+const BCX = 2500;
+const BCY = 1500;
+const SNAKE_W = 600;
+const SNAKE_H = 240;
 
 /* ── AUDIO ENGINE ── */
 var AC=null,soundOn=true;
@@ -653,45 +753,41 @@ var BZ_SLOTS={1:['bz0'],2:['bz0','bz2'],3:['bz0','bz1','bz2'],4:['bz3','bz0','bz
 
 function genSet(){var t=[];for(var a=0;a<=6;a++)for(var b=a;b<=6;b++)t.push({a:a,b:b});return t}
 function shuffle(arr){for(var i=arr.length-1;i>0;i--){var j=0|Math.random()*(i+1);var tmp=arr[i];arr[i]=arr[j];arr[j]=tmp}return arr}
-function pip(t){return t.a+t.b}
+function pip(t){return t?a+b:0}
 function hpip(p){return p.hand.reduce(function(s,t){return s+pip(t)},0)}
 
 /* ── GLOBAL STATE ── */
-var G={},TMR=null,SEL=-1;
-/* Stats */
+var G={},TMR=null,SEL=-1,isMultiplayer=false,mpRoomId=null,mpPlayerId=null,mpListeners=[];
 var STATS={wins:0,losses:0,gamesPlayed:0,tilesPlayed:0,roundsPlayed:0};
 
-/* ── BOARD LAYOUT ENGINE ──────────────────────────────────────────────
-   REAL SNAKE PATTERN — like actual dominoes table:
-   Start center. Go RIGHT. When right arm hits wall boundary → turn DOWN.
-   Then go LEFT. Hit wall → turn UP. Etc.
-   Each "arm" is a segment in one direction.
-   We track:
-     chain[] = array of placed tile records
-     Each record: {a, b, x, y, dir, dbl}
-       dir: 'R'|'L'|'U'|'D' = direction tile extends in
-   Open ends: left end (head) and right end (tail)
-   Each end has: {x, y, openVal, dir}  where dir = incoming direction
-──────────────────────────────────────────────────────────────────── */
+/* ── BOARD DIMENSIONS ── */
+var TW=68, TH=36, DW=36, DH=68, GAP=2;
 
-/* Tile dimensions on board */
-var TW=68,TH=36; /* normal tile: long=68, short=36 */
-var DW=36,DH=68; /* double tile (rotated 90°): long=68, short=36 → w=36,h=68 */
-/* Gap between tiles */
-var GAP=2;
-/* Virtual board center */
-var BCX=2500,BCY=1500;
-/* Snake boundary margin from center (half-width of snake region) */
-var SNAKE_W=600; /* go this many px right/left before turning */
-var SNAKE_H=240; /* row height for snake turns */
-
-function initGame(numBots){
-  var tiles=shuffle(genSet()),total=1+numBots,hs=total<=2?7:5;
+function initGame(numBots, isMP){
+  isMultiplayer = isMP || false;
+  var tiles=shuffle(genSet()),total=isMP ? G.multiplayerPlayers.length : 1+numBots;
+  var hs=total<=2?7:5;
   var players=[];
-  for(var i=0;i<total;i++){
-    players.push({id:i,name:i===0?'You':BOTS[i-1].name,emoji:i===0?'🧑':BOTS[i-1].emoji,
-      color:i===0?'#4ddd88':BOTS[i-1].color,bot:i!==0,hand:tiles.splice(0,hs),score:0})}
-  /* Determine first player */
+  
+  if(isMP){
+    // Multiplayer: use players from lobby
+    for(var i=0;i<G.multiplayerPlayers.length;i++){
+      var mp = G.multiplayerPlayers[i];
+      players.push({id:i, name:mp.name, emoji:'🧑', color:'#4ddd88', bot:false, 
+        hand:tiles.splice(0,hs), score:0, mpId:mp.id});
+    }
+    // Mark local player
+    G.localPlayerId = players.findIndex(p => p.mpId === mpPlayerId);
+    if(G.localPlayerId === -1) G.localPlayerId = 0;
+    players[G.localPlayerId].emoji = '🧑';
+  } else {
+    for(var i=0;i<total;i++){
+      players.push({id:i,name:i===0?'You':BOTS[i-1].name,emoji:i===0?'🧑':BOTS[i-1].emoji,
+        color:i===0?'#4ddd88':BOTS[i-1].color,bot:i!==0,hand:tiles.splice(0,hs),score:0})}
+    G.localPlayerId = 0;
+  }
+
+  // Determine first player
   var first=-1,hd=-1;
   for(var pi=0;pi<players.length;pi++)for(var ti=0;ti<players[pi].hand.length;ti++){
     var t=players[pi].hand[ti];if(t.a===t.b&&t.a>hd){hd=t.a;first=pi}}
@@ -700,41 +796,22 @@ function initGame(numBots){
   if(first===-1)first=0;
 
   G={players:players,boneyard:tiles,
-    chain:[],   /* placed tile records */
-    /* Head = left end of chain, Tail = right end */
-    head:{x:BCX,y:BCY,dir:'L',val:null}, /* where next left tile attaches */
-    tail:{x:BCX,y:BCY,dir:'R',val:null}, /* where next right tile attaches */
-    numBots:numBots,cur:first,over:false,isFirst:true,passStreak:0};
+    chain:[],
+    head:{x:BCX,y:BCY,dir:'L',val:null},
+    tail:{x:BCX,y:BCY,dir:'R',val:null},
+    numBots:numBots,cur:first,over:false,isFirst:true,passStreak:0,
+    isMultiplayer:isMP, localPlayerId:G.localPlayerId || 0};
   SEL=-1;
-  /* Reset zoom */
   resetZoom();
 }
 
-/* ── PLACE TILE ON BOARD ──
-   Each tile record: {a, b, x, y, w, h, cssRot, dbl, side}
-   x,y = top-left corner of tile on board
-   cssRot = CSS rotation in degrees (0, 90)
-   
-   Chain direction system:
-   We have head (left end) and tail (right end).
-   head.dir = direction new tiles extend AWAY from chain
-   tail.dir = direction new tiles extend AWAY from chain
-   
-   For a normal (non-double) tile:
-     - Tile is oriented along the chain direction
-   For a double tile:
-     - Tile is rotated 90° (perpendicular)
-   
-   Snake turning: when tail goes too far RIGHT → next tile goes DOWN
-   then next segment goes LEFT, etc.
-── */
-
+/* ── TILE PLACEMENT FUNCTIONS ── */
 function placeChain(player,tIdx,side){
+  if(!player || !player.hand[tIdx]) return;
   var t=player.hand[tIdx],rA=t.a,rB=t.b;
   STATS.tilesPlayed++;
 
   if(G.isFirst){
-    /* First tile: center, going right */
     var dbl=(t.a===t.b);
     var w=dbl?DW:TW,h=dbl?DH:TH;
     var x=BCX-w/2,y=BCY-h/2;
@@ -743,16 +820,12 @@ function placeChain(player,tIdx,side){
     G.tail={x:x+w,y:y+h/2,dir:'R',val:rB};
     G.isFirst=false;
   } else if(side==='L'){
-    /* Orient so connecting end = openL (head.val) */
     if(t.a===G.head.val){rA=t.b;rB=t.a}else{rA=t.a;rB=t.b}
-    /* rB connects to head, rA is new open */
     var rec=attachToHead(rA,rB,t.a===t.b||rA===rB);
     G.chain.unshift(rec);
     G.head.val=rA;
   } else {
-    /* Orient so connecting end = openR (tail.val) */
     if(t.a===G.tail.val){rA=t.a;rB=t.b}else{rA=t.b;rB=t.a}
-    /* rA connects to tail, rB is new open */
     var rec2=attachToTail(rA,rB,t.a===t.b||rA===rB);
     G.chain.push(rec2);
     G.tail.val=rB;
@@ -762,73 +835,64 @@ function placeChain(player,tIdx,side){
   G.passStreak=0;SEL=-1;
   SFX.place();renderBoard();renderHUD();
 
-  /* Score popup */
   if(!G.isFirst&&G.head.val!==null&&G.tail.val!==null){
     var es=G.head.val+G.tail.val;
     if(es>0&&es%5===0)scorePop(es)}
 }
 
-/* Attach a new tile to the TAIL (right/current end) */
 function attachToTail(rA,rB,dbl){
   var end=G.tail,dir=end.dir;
-  /* Tile dimensions depend on: dbl + direction */
-  /* Normal tile: long axis along dir */
-  /* Double tile: short axis along dir (perpendicular) */
-  var tw,th,nx,ny,cssRot=0;
-
+  var tw,th,nx,ny;
   if(dbl){
-    /* Double: always perpendicular. w=DW, h=DH regardless */
     tw=DW;th=DH;
     if(dir==='R'||dir==='L'){
-      /* chain going horizontal → double is vertical */
       nx=end.x;ny=end.y-DH/2;
     } else {
-      /* chain going vertical → double is horizontal */
       tw=DH;th=DW;
       nx=end.x-DH/2;ny=end.y;
     }
-    /* After placing double, cursor advances same direction */
-    advanceTail(dir,dbl?tw:tw,dbl?th:th,nx,ny);
+    advanceTail(dir,tw,th,nx,ny);
   } else {
-    /* Normal tile: oriented along dir */
     if(dir==='R'){tw=TW;th=TH;nx=end.x;ny=end.y-TH/2;}
     else if(dir==='L'){tw=TW;th=TH;nx=end.x-TW;ny=end.y-TH/2;}
     else if(dir==='D'){tw=TH;th=TW;nx=end.x-TH/2;ny=end.y;}
-    else{tw=TH;th=TW;nx=end.x-TH/2;ny=end.y-TW;} /* U */
+    else{tw=TH;th=TW;nx=end.x-TH/2;ny=end.y-TW;}
     advanceTail(dir,tw,th,nx,ny);
   }
   return{a:rA,b:rB,x:nx,y:ny,w:tw,h:th,dbl:dbl,dir:dir,side:'tail'};
 }
 
 function advanceTail(dir,tw,th,nx,ny){
-  var next;
   if(dir==='R'){
-    next={x:nx+tw,y:ny+th/2};
-    /* Check snake turn: if too far right */
-    if(next.x>BCX+SNAKE_W){
-      /* Turn down: next tile will go DOWN */
-      G.tail={x:nx+tw/2,y:ny+th,dir:'D',val:G.tail.val};return}
+    var nextX = nx+tw;
+    if(nextX>BCX+SNAKE_W){
+      G.tail={x:nx+tw/2,y:ny+th,dir:'D',val:G.tail.val};return
+    }
+    G.tail={x:nx+tw,y:ny+th/2,dir:dir,val:G.tail.val};
   }else if(dir==='L'){
-    next={x:nx,y:ny+th/2};
-    if(next.x<BCX-SNAKE_W){
-      /* Turn up */
-      G.tail={x:nx+tw/2,y:ny,dir:'U',val:G.tail.val};return}
+    if(nx<BCX-SNAKE_W){
+      G.tail={x:nx+tw/2,y:ny,dir:'U',val:G.tail.val};return
+    }
+    G.tail={x:nx,y:ny+th/2,dir:dir,val:G.tail.val};
   }else if(dir==='D'){
-    next={x:nx+tw/2,y:ny+th};
-    /* After going down one tile, turn left */
-    G.tail={x:nx,y:ny+th/2,dir:'L',val:G.tail.val};return;
-  }else{ /* U */
-    next={x:nx+tw/2,y:ny};
-    G.tail={x:nx+tw,y:ny+th/2,dir:'R',val:G.tail.val};return;
+    var nextY = ny+th;
+    if(nextY>BCY+SNAKE_H){
+      G.tail={x:nx,y:ny+th/2,dir:'L',val:G.tail.val};
+    } else {
+      G.tail={x:nx+tw/2,y:ny+th,dir:dir,val:G.tail.val};
+    }
+  }else{
+    if(ny<BCY-SNAKE_H){
+      G.tail={x:nx+tw,y:ny+th/2,dir:'R',val:G.tail.val};
+    } else {
+      G.tail={x:nx+tw/2,y:ny,dir:dir,val:G.tail.val};
+    }
   }
-  G.tail={x:next.x,y:next.y,dir:dir,val:G.tail.val};
 }
 
-/* Attach a new tile to the HEAD (left end) */
 function attachToHead(rA,rB,dbl){
   var end=G.head,dir=end.dir;
   var tw,th,nx,ny;
-  /* Head dir is opposite: 'L' means we place tiles going further left */
   if(dbl){
     tw=DW;th=DH;
     if(dir==='L'||dir==='R'){nx=end.x-DW;ny=end.y-DH/2;}
@@ -838,7 +902,7 @@ function attachToHead(rA,rB,dbl){
     if(dir==='L'){tw=TW;th=TH;nx=end.x-TW;ny=end.y-TH/2;}
     else if(dir==='R'){tw=TW;th=TH;nx=end.x;ny=end.y-TH/2;}
     else if(dir==='U'){tw=TH;th=TW;nx=end.x-TH/2;ny=end.y-TW;}
-    else{tw=TH;th=TW;nx=end.x-TH/2;ny=end.y;} /* D */
+    else{tw=TH;th=TW;nx=end.x-TH/2;ny=end.y;}
     advanceHead(dir,tw,th,nx,ny);
   }
   return{a:rA,b:rB,x:nx,y:ny,w:tw,h:th,dbl:dbl,dir:dir,side:'head'};
@@ -846,17 +910,30 @@ function attachToHead(rA,rB,dbl){
 
 function advanceHead(dir,tw,th,nx,ny){
   if(dir==='L'){
-    var cx=nx;
-    if(cx<BCX-SNAKE_W){G.head={x:nx+tw/2,y:ny,dir:'U',val:G.head.val};return}
+    if(nx<BCX-SNAKE_W){
+      G.head={x:nx+tw/2,y:ny,dir:'U',val:G.head.val};return
+    }
     G.head={x:nx,y:ny+th/2,dir:dir,val:G.head.val};
   }else if(dir==='R'){
     var cx2=nx+tw;
-    if(cx2>BCX+SNAKE_W){G.head={x:nx+tw/2,y:ny+th,dir:'D',val:G.head.val};return}
+    if(cx2>BCX+SNAKE_W){
+      G.head={x:nx+tw/2,y:ny+th,dir:'D',val:G.head.val};return
+    }
     G.head={x:nx+tw,y:ny+th/2,dir:dir,val:G.head.val};
   }else if(dir==='U'){
-    G.head={x:nx+tw,y:ny+th/2,dir:'R',val:G.head.val};
+    var nyNext = ny;
+    if(nyNext<BCY-SNAKE_H){
+      G.head={x:nx+tw,y:ny+th/2,dir:'R',val:G.head.val};
+    } else {
+      G.head={x:nx+tw/2,y:ny,dir:dir,val:G.head.val};
+    }
   }else{
-    G.head={x:nx,y:ny+th/2,dir:'L',val:G.head.val};
+    var nyNext2 = ny+th;
+    if(nyNext2>BCY+SNAKE_H){
+      G.head={x:nx,y:ny+th/2,dir:'L',val:G.head.val};
+    } else {
+      G.head={x:nx+tw/2,y:ny+th,dir:dir,val:G.head.val};
+    }
   }
 }
 
@@ -887,8 +964,8 @@ function botMove(p){
   if(best){placeChain(p,best.idx,best.side);return true}return false}
 
 /* ── BONEYARD ── */
-function getReserve(){return G.players.length<=2?2:1}
-function byardOk(){return G.boneyard.length>getReserve()}
+function getReserve(){return G.players&&G.players.length<=2?2:1}
+function byardOk(){return G.boneyard&&G.boneyard.length>getReserve()}
 function drawTile(p){
   if(!byardOk())return null;
   var t=G.boneyard.shift();p.hand.push(t);SFX.draw();renderBoneyard();return t}
@@ -909,19 +986,37 @@ function endHand(winIdx,blocked){
   if(blocked){var mine=hpip(w),all=G.players.reduce(function(s,p){return s+hpip(p)},0);bonus=rnd5(all-mine)}
   else{var opp=0;for(var i=0;i<G.players.length;i++)if(i!==winIdx)opp+=hpip(G.players[i]);bonus=rnd5(opp)}
   w.score+=bonus;
-  if(winIdx===0){STATS.wins++;SFX.win()}else{STATS.losses++;SFX.lose()}
+  if(winIdx===G.localPlayerId){STATS.wins++;SFX.win()}else{STATS.losses++;SFX.lose()}
   STATS.gamesPlayed++;renderHUD();
   setTimeout(function(){showGO(winIdx,bonus,blocked)},350)}
 
 /* ── TURN ENGINE ── */
-function nextPlayer(){G.cur=(G.cur+1)%G.players.length;runTurn()}
+function nextPlayer(){
+  G.cur=(G.cur+1)%G.players.length;
+  if(G.isMultiplayer) mpSyncGameState();
+  runTurn();
+}
+
 function runTurn(){
   if(G.over)return;
   var p=G.players[G.cur];renderHUD();renderTurnBadge(p);
   if(p.hand.length===0){endHand(p.id,false);return}
-  if(p.bot){setSt('⏳',p.name+' is thinking…');setBotThinking(p.id,true);
-    TMR=setTimeout(function(){doBotTurn(p)},880+Math.random()*380)}
-  else{setBotThinking(-1,false);SFX.yours();doHumanTurn(p)}}
+  
+  if(G.isMultiplayer){
+    if(G.cur === G.localPlayerId){
+      setBotThinking(-1,false);SFX.yours();doHumanTurn(p);
+    } else {
+      setSt('⏳',p.name+' is thinking… Waiting for their move.');
+      setBotThinking(p.id,true);
+    }
+  } else {
+    if(p.bot){
+      setSt('⏳',p.name+' is thinking…');setBotThinking(p.id,true);
+      TMR=setTimeout(function(){doBotTurn(p)},880+Math.random()*380)
+    }
+    else{setBotThinking(-1,false);SFX.yours();doHumanTurn(p)}
+  }
+}
 
 function doBotTurn(p){
   setBotThinking(p.id,false);
@@ -944,7 +1039,7 @@ function doHumanTurn(p){
   else if(byardOk()){setSt('🃏','No valid moves — tap the Boneyard to draw.');renderHand([])}
   else{G.passStreak=(G.passStreak||0)+1;setSt('⏭️','No moves, boneyard empty — turn passed.');SFX.pass();renderHand([]);
     if(G.passStreak>=G.players.length||isBlocked()){setTimeout(blockEnd,800)}
-    else{setTimeout(nextPlayer,1100)}}}
+    else{if(G.isMultiplayer) mpSyncGameState(); setTimeout(nextPlayer,1100)}}}
 
 function blockEnd(){
   var minP=Infinity,minI=0;
@@ -953,8 +1048,8 @@ function blockEnd(){
 
 /* ── HUMAN ACTIONS ── */
 function tileClick(idx){
-  if(G.cur!==0||G.over)return;
-  var p=G.players[0],oL=G.head.val,oR=G.tail.val;
+  if(G.cur!==G.localPlayerId||G.over)return;
+  var p=G.players[G.localPlayerId],oL=G.head.val,oR=G.tail.val;
   var valid=validMoves(p.hand,oL,oR,G.isFirst);
   if(valid.indexOf(idx)===-1){SFX.bad();return}
   SFX.click();
@@ -969,34 +1064,33 @@ function tileClick(idx){
     setSt('🔀','Choose which end of the chain to play on:');
   }else{SEL=-1;placeChain(p,idx,canL?'L':'R');afterHuman(p)}}
 
-function doSide(side){if(SEL===-1)return;SFX.click();var p=G.players[0];hideSB();placeChain(p,SEL,side);SEL=-1;afterHuman(p)}
+function doSide(side){if(SEL===-1)return;SFX.click();var p=G.players[G.localPlayerId];hideSB();placeChain(p,SEL,side);SEL=-1;afterHuman(p)}
 function cancelSide(){SFX.click();SEL=-1;hideSB()}
 function hideSB(){document.getElementById('sbar').classList.add('off')}
-function afterHuman(p){hideSB();SEL=-1;if(p.hand.length===0){endHand(0,false);return}if(isBlocked()){blockEnd();return}setTimeout(nextPlayer,360)}
+function afterHuman(p){hideSB();SEL=-1;if(p.hand.length===0){endHand(G.localPlayerId,false);return}if(isBlocked()){blockEnd();return}if(G.isMultiplayer) mpSyncGameState(); setTimeout(nextPlayer,360)}
 
 function playerDraw(){
-  if(G.cur!==0||G.over)return;
-  var p=G.players[0],oL=G.head.val,oR=G.tail.val;
+  if(G.cur!==G.localPlayerId||G.over)return;
+  var p=G.players[G.localPlayerId],oL=G.head.val,oR=G.tail.val;
   var valid=validMoves(p.hand,oL,oR,G.isFirst);
   if(valid.length>0){SFX.bad();setSt('⚠️','You have playable tiles — tap a glowing one!');
     var tls=document.querySelectorAll('.tile.play');
     for(var i=0;i<tls.length;i++){(function(el){el.style.transform='translateY(-13px) scale(1.1)';
       setTimeout(function(){el.style.transform=''},300)})(tls[i])};return}
   if(!byardOk()){G.passStreak=(G.passStreak||0)+1;setSt('⏭️','Boneyard empty — passing your turn.');SFX.pass();
-    setTimeout(function(){if(isBlocked()||G.passStreak>=G.players.length){blockEnd();return}nextPlayer()},900);return}
+    setTimeout(function(){if(isBlocked()||G.passStreak>=G.players.length){blockEnd();return}if(G.isMultiplayer) mpSyncGameState(); nextPlayer()},900);return}
   var drawn=drawTile(p);
   if(drawn){toast('Drew: '+drawn.a+'-'+drawn.b);
     var v2=validMoves(p.hand,G.head.val,G.tail.val,G.isFirst);renderHand(v2);
     setSt(v2.length?'✅':'🃏',v2.length?'Tile drawn! Tap it to play.':"No match — draw again or wait.")}}
 
-/* ── RENDER: BOARD ── */
+/* ── RENDER FUNCTIONS ── */
 function renderBoard(){
   var board=document.getElementById('board');board.innerHTML='';
   if(!G.chain||!G.chain.length)return;
   var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
   for(var i=0;i<G.chain.length;i++){
-    var rec=G.chain[i],dbl=rec.dbl;
-    /* Determine visual orientation: if tile is tall (h>w) → vertical, else horizontal */
+    var rec=G.chain[i];
     var isVert=(rec.h>rec.w);
     var el=mkTile(rec.a,rec.b,{horiz:!isVert,board:true});
     el.classList.add('btile');
@@ -1006,16 +1100,16 @@ function renderBoard(){
     board.appendChild(el);
     minX=Math.min(minX,rec.x);maxX=Math.max(maxX,rec.x+rec.w);
     minY=Math.min(minY,rec.y);maxY=Math.max(maxY,rec.y+rec.h)}
-  /* Auto-pan to keep chain centered */
   centerOnChain(minX,maxX,minY,maxY)}
 
-/* ── ZOOM / PAN SYSTEM ── */
-var zoom=1,panX=0,panY=0;
-var ZOOM_MIN=0.25,ZOOM_MAX=3;
+/* ── ZOOM/PAN ── */
+var zoom=1,panX=0,panY=0,ZOOM_MIN=0.25,ZOOM_MAX=3;
 
 function applyTransform(){
   var bc=document.getElementById('bcanvas');
   if(!bc)return;
+  panX = Math.max(-3000, Math.min(3000, panX));
+  panY = Math.max(-2000, Math.min(2000, panY));
   bc.style.transform='translate('+panX+'px,'+panY+'px) scale('+zoom+')';
   var pct=document.getElementById('zoom-pct');
   if(pct)pct.textContent=Math.round(zoom*100)+'%'}
@@ -1024,7 +1118,6 @@ function doZoom(factor,cx,cy){
   var bvp=document.getElementById('bvp');if(!bvp)return;
   if(cx===undefined){cx=bvp.clientWidth/2;cy=bvp.clientHeight/2}
   var newZoom=Math.max(ZOOM_MIN,Math.min(ZOOM_MAX,zoom*factor));
-  /* Zoom toward (cx,cy) in viewport */
   var ratio=newZoom/zoom;
   panX=cx-(cx-panX)*ratio;
   panY=cy-(cy-panY)*ratio;
@@ -1034,7 +1127,6 @@ function resetZoom(){
   zoom=1;
   var bvp=document.getElementById('bvp');
   if(!bvp){panX=0;panY=0;applyTransform();return}
-  /* Center on board center */
   panX=bvp.clientWidth/2-BCX;
   panY=bvp.clientHeight/2-BCY;
   applyTransform()}
@@ -1042,31 +1134,27 @@ function resetZoom(){
 function centerOnChain(minX,maxX,minY,maxY){
   var bvp=document.getElementById('bvp');if(!bvp)return;
   var chainCX=(minX+maxX)/2,chainCY=(minY+maxY)/2;
-  /* Smoothly pan to keep chain visible, don't change zoom */
   var targetPanX=bvp.clientWidth/2-chainCX*zoom;
   var targetPanY=bvp.clientHeight/2-chainCY*zoom;
-  /* Lerp */
   panX=panX+(targetPanX-panX)*.35;
   panY=panY+(targetPanY-panY)*.35;
   applyTransform()}
 
-/* ── INPUT: MOUSE WHEEL ZOOM ── */
+/* ── INPUT HANDLERS ── */
 (function(){
-  var bvp=function(){return document.getElementById('bvp')};
+  var bvpEl=null;
+  function getBVP(){if(!bvpEl)bvpEl=document.getElementById('bvp');return bvpEl}
   document.addEventListener('wheel',function(e){
-    var b=bvp();if(!b||!b.contains(e.target))return;
+    var b=getBVP();if(!b||!b.contains(e.target))return;
     e.preventDefault();
     var rect=b.getBoundingClientRect();
     var cx=e.clientX-rect.left,cy=e.clientY-rect.top;
     var factor=e.deltaY<0?1.1:0.909;
     doZoom(factor,cx,cy)},{passive:false});
-})();
-
-/* ── INPUT: MOUSE DRAG PAN ── */
-(function(){
+  
   var dn=false,lx,ly;
   document.addEventListener('mousedown',function(e){
-    var b=document.getElementById('bvp');if(!b||!b.contains(e.target))return;
+    var b=getBVP();if(!b||!b.contains(e.target))return;
     if(e.target.closest&&e.target.closest('.tile'))return;
     dn=true;lx=e.clientX;ly=e.clientY;e.preventDefault()});
   document.addEventListener('mousemove',function(e){
@@ -1074,33 +1162,24 @@ function centerOnChain(minX,maxX,minY,maxY){
     panX+=dx;panY+=dy;lx=e.clientX;ly=e.clientY;applyTransform()});
   document.addEventListener('mouseup',function(){dn=false});
   document.addEventListener('mouseleave',function(){dn=false});
-})();
 
-/* ── INPUT: TOUCH (pinch-zoom + drag pan) ── */
-(function(){
   var t1=null,t2=null,lastDist=null,lastMx,lastMy;
-  function getPos(touches){
-    var bvp=document.getElementById('bvp');if(!bvp)return null;
-    var rect=bvp.getBoundingClientRect();
-    return{x:touches[0].clientX-rect.left,y:touches[0].clientY-rect.top}}
-  function dist(a,b){return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)}
   document.addEventListener('touchstart',function(e){
-    var bvp=document.getElementById('bvp');if(!bvp||!bvp.contains(e.target))return;
-    /* Allow tile taps: if target is a tile, don't intercept */
+    var b=getBVP();if(!b||!b.contains(e.target))return;
     if(e.touches.length===1&&e.target.closest&&e.target.closest('.tile.play'))return;
     e.preventDefault();
     if(e.touches.length===1){t1=e.touches[0];t2=null;lastDist=null;
       lastMx=t1.clientX;lastMy=t1.clientY}
     else if(e.touches.length===2){t1=e.touches[0];t2=e.touches[1];
-      lastDist=dist(t1,t2)}},{passive:false});
+      lastDist=Math.hypot(t1.clientX-t2.clientX,t1.clientY-t2.clientY)}},{passive:false});
   document.addEventListener('touchmove',function(e){
-    var bvp=document.getElementById('bvp');if(!bvp||!bvp.contains(e.target))return;
+    var b=getBVP();if(!b||!b.contains(e.target))return;
     e.preventDefault();
     if(e.touches.length===2&&t2!==null){
-      var d=dist(e.touches[0],e.touches[1]);
+      var d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
       if(lastDist!==null){
         var factor=d/lastDist;
-        var rect=bvp.getBoundingClientRect();
+        var rect=b.getBoundingClientRect();
         var mx=(e.touches[0].clientX+e.touches[1].clientX)/2-rect.left;
         var my=(e.touches[0].clientY+e.touches[1].clientY)/2-rect.top;
         doZoom(factor,mx,my)}lastDist=d}
@@ -1114,10 +1193,10 @@ function centerOnChain(minX,maxX,minY,maxY){
       lastMx=t1.clientX;lastMy=t1.clientY}},{passive:false});
 })();
 
-/* ── RENDER: PLAYER HAND ── */
+/* ── RENDER HELPERS ── */
 function renderHand(validSet){
   validSet=validSet||[];var ph=document.getElementById('ph');ph.innerHTML='';
-  var p=G.players[0];if(!p)return;
+  var p=G.players[G.localPlayerId];if(!p)return;
   var vs={};for(var i=0;i<validSet.length;i++)vs[validSet[i]]=true;
   for(var i=0;i<p.hand.length;i++){(function(t,idx){
     var play=!!vs[idx],sel=(SEL===idx);
@@ -1126,20 +1205,38 @@ function renderHand(validSet){
     el.style.animation='tpl .28s cubic-bezier(.34,1.56,.64,1) '+(idx*36)+'ms both';
     ph.appendChild(el)})(p.hand[i],i)}}
 
-/* ── RENDER: BOT ZONES ── */
 function renderBotZones(){
   for(var zi=0;zi<BZ_IDS.length;zi++){var z=document.getElementById(BZ_IDS[zi]);if(z)z.style.display='none'}
-  var slots=BZ_SLOTS[G.numBots]||['bz0'];
-  for(var b=0;b<G.numBots;b++){
-    var p=G.players[b+1],zid=slots[b],zone=document.getElementById(zid);if(!zone||!p)continue;
-    zone.style.cssText='display:flex;'+BZ_STYLES[zid];
-    zone.innerHTML='<div class="bzav" id="av-'+p.id+'">'+p.emoji+'</div>'+
-      '<div class="bzinfo"><div class="bzname" id="bn-'+p.id+'">'+p.name+'</div>'+
-      '<div class="bzcnt" id="bc-'+p.id+'">'+p.hand.length+' tiles</div></div>'+
-      '<div class="bzh" id="bh-'+p.id+'"></div>';
-    fillBotHand(p)}}
+  if(G.isMultiplayer) {
+    // In multiplayer, show other players in bot zones
+    var slots=BZ_SLOTS[Math.max(1,G.players.length-1)]||['bz0'];
+    var slotIdx=0;
+    for(var b=0;b<G.players.length;b++){
+      if(b===G.localPlayerId) continue;
+      var p=G.players[b],zid=slots[slotIdx],zone=document.getElementById(zid);
+      if(!zone||!p||slotIdx>=slots.length) continue;
+      zone.style.cssText='display:flex;'+BZ_STYLES[zid];
+      zone.innerHTML='<div class="bzav" id="av-'+p.id+'">🧑</div>'+
+        '<div class="bzinfo"><div class="bzname" id="bn-'+p.id+'">'+p.name+'</div>'+
+        '<div class="bzcnt" id="bc-'+p.id+'">'+p.hand.length+' tiles</div></div>'+
+        '<div class="bzh" id="bh-'+p.id+'"></div>';
+      fillBotHand(p);slotIdx++;
+    }
+  } else {
+    var slots=BZ_SLOTS[G.numBots]||['bz0'];
+    for(var b=0;b<G.numBots;b++){
+      var p=G.players[b+1],zid=slots[b],zone=document.getElementById(zid);if(!zone||!p)continue;
+      zone.style.cssText='display:flex;'+BZ_STYLES[zid];
+      zone.innerHTML='<div class="bzav" id="av-'+p.id+'">'+p.emoji+'</div>'+
+        '<div class="bzinfo"><div class="bzname" id="bn-'+p.id+'">'+p.name+'</div>'+
+        '<div class="bzcnt" id="bc-'+p.id+'">'+p.hand.length+' tiles</div></div>'+
+        '<div class="bzh" id="bh-'+p.id+'"></div>';
+      fillBotHand(p)}
+  }
+}
+
 function renderBotHands(){
-  for(var i=0;i<G.players.length;i++){var p=G.players[i];if(!p.bot)continue;
+  for(var i=0;i<G.players.length;i++){var p=G.players[i];if(i===G.localPlayerId)continue;
     var bn=document.getElementById('bn-'+p.id),bc=document.getElementById('bc-'+p.id);
     if(bn)bn.firstChild.nodeValue=p.name;if(bc)bc.textContent=p.hand.length+' tiles';
     fillBotHand(p)}}
@@ -1155,19 +1252,18 @@ function setBotThinking(pid,show){
         d.innerHTML='<span></span><span></span><span></span>';bn.appendChild(d)}}
       else if(td)td.remove()}}}
 
-/* ── RENDER: BONEYARD ── */
 function renderBoneyard(){
   var cnt=document.getElementById('by-count'),pile=document.getElementById('byp');if(!cnt||!pile)return;
   cnt.textContent=G.boneyard?G.boneyard.length:'';
   var ok=byardOk();pile.style.opacity=ok?'1':'0.2';pile.style.pointerEvents=ok?'auto':'none';
   pile.title=ok?'Click to draw ('+G.boneyard.length+' left)':'Boneyard exhausted'}
 
-/* ── RENDER: HUD ── */
 function renderHUD(){
   var el=document.getElementById('hscores');el.innerHTML='';
   for(var i=0;i<G.players.length;i++){var p=G.players[i];
-    var c=document.createElement('div');c.className='chip'+(p.id===G.cur?' act':'');
-    c.innerHTML='<span style="margin-right:2px">'+p.emoji+'</span>'+
+    var c=document.createElement('div');c.className='chip'+(p.id===G.cur?' act':'')+(G.isMultiplayer?' mp-chip':'');
+    var emoji = (i===G.localPlayerId) ? '🧑' : (p.emoji||'🧑');
+    c.innerHTML='<span style="margin-right:2px">'+emoji+'</span>'+
       '<span class="cn">'+p.name+'</span><span class="cs">'+p.score+'pts</span>'+
       '<span class="ct">['+p.hand.length+']</span>';el.appendChild(c)}}
 
@@ -1175,28 +1271,25 @@ function renderTurnBadge(p){
   var tb=document.getElementById('tbadge'),txt=document.getElementById('tbadge-txt');
   if(!p){if(tb)tb.classList.add('off');return}
   tb.classList.remove('off');
-  var you=(p.id===0);
+  var you=(p.id===G.localPlayerId);
   tb.className=(you?'yours':'theirs');tb.id='tbadge';
-  if(txt)txt.textContent=you?'YOUR TURN':(p.emoji+' '+p.name+"'s Turn")}
+  if(txt)txt.textContent=you?'YOUR TURN':(p.name+"'s Turn")}
 
 function setSt(icon,msg){
   var ic=document.getElementById('stat-ic'),tx=document.getElementById('stat-txt');
   if(ic)ic.textContent=icon||'⏳';if(tx)tx.textContent=msg||'';
   var st=document.getElementById('stat');if(st){st.classList.remove('stfl');void st.offsetWidth;st.classList.add('stfl')}}
 
-/* ── TOAST ── */
 function toast(msg){
   var wrap=document.getElementById('toasts'),el=document.createElement('div');
   el.className='toast';el.textContent=msg;wrap.appendChild(el);
   setTimeout(function(){el.classList.add('out');setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},280)},2600)}
 
-/* ── SCORE POP ── */
 function scorePop(n){
   var el=document.createElement('div');el.className='spop';
   el.textContent='+'+n+'!';el.style.left=(28+Math.random()*42)+'%';el.style.top='44%';
   document.body.appendChild(el);setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el)},1350)}
 
-/* ── CONFETTI ── */
 function launchConfetti(){
   var cv=document.getElementById('cnfc'),ctx=cv.getContext('2d');
   cv.width=cv.offsetWidth||400;cv.height=cv.offsetHeight||360;
@@ -1213,10 +1306,9 @@ function launchConfetti(){
       ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()}
     if(alive&&fr++<200)requestAnimationFrame(draw);else ctx.clearRect(0,0,W,H)}draw()}
 
-/* ── GAME OVER ── */
 function showGO(winIdx,bonus,blocked){
-  var w=G.players[winIdx],youWin=(w.id===0);
-  document.getElementById('go-trophy').textContent=youWin?'🏆':w.emoji;
+  var w=G.players[winIdx],youWin=(w.id===G.localPlayerId);
+  document.getElementById('go-trophy').textContent=youWin?'🏆':w.emoji||'🧑';
   document.getElementById('go-title').textContent=youWin?'You Win!':w.name+' Wins!';
   document.getElementById('go-msg').textContent=
     (blocked?'Game blocked — fewest pips wins! ':(youWin?'You played all tiles! ':w.name+' played all tiles. '))
@@ -1226,12 +1318,12 @@ function showGO(winIdx,bonus,blocked){
   var sorted=G.players.slice().sort(function(a,b){return b.score-a.score});
   for(var i=0;i<sorted.length;i++){var p=sorted[i];
     var r=document.createElement('div');r.className='grow'+(p.id===winIdx?' w':'');
-    r.innerHTML='<div class="grow-l"><span>'+p.emoji+'</span><span>'+p.name+'</span>'+(p.id===winIdx?'<span style="font-size:.7rem">🥇</span>':'')+'</div>'+
+    r.innerHTML='<div class="grow-l"><span>'+((p.id===G.localPlayerId)?'🧑':(p.emoji||'🧑'))+'</span><span>'+p.name+'</span>'+(p.id===winIdx?'<span style="font-size:.7rem">🥇</span>':'')+'</div>'+
       '<span>'+p.score+' pts <span class="grow-pips">('+hpip(p)+' pips)</span></span>';sc.appendChild(r)}
   document.getElementById('gov').classList.remove('off');
   if(youWin)setTimeout(launchConfetti,220)}
 
-/* ── STATS MODAL ── */
+/* ── MODALS ── */
 function openStats(){
   SFX.click();if(document.getElementById('statsmod'))return;
   var m=document.createElement('div');m.id='statsmod';
@@ -1252,7 +1344,6 @@ function openStats(){
     '</div>';
   document.body.appendChild(m)}
 
-/* ── RULES MODAL ── */
 function openRules(){
   SFX.click();if(document.getElementById('rulesmod'))return;
   var m=document.createElement('div');m.id='rulesmod';
@@ -1261,18 +1352,16 @@ function openRules(){
   m.innerHTML='<div class="rulebox">'+
     '<h2>📖 How to Play Dominoes</h2>'+
     '<div class="rb">'+
-    '<p><b>🎯 Objective:</b> Empty your hand first. Score points from opponents\' remaining pips. First to 100 pts wins.</p>'+
+    '<p><b>🎯 Objective:</b> Empty your hand first. Score points from opponents\' remaining pips.</p>'+
     '<p><b>🃏 Setup:</b> 28 tiles [0|0]–[6|6]. 2 players get 7 tiles; 3-5 players get 5 tiles each.</p>'+
-    '<p><b>▶ First Move:</b> Player with the highest double goes first. Tile is placed in center of the table.</p>'+
-    '<p><b>🔗 Playing:</b> Match one end of your tile to an open end on the table. Doubles are placed perpendicular.</p>'+
-    '<p><b>🃏 Drawing:</b> No valid move? Tap the Boneyard to draw until you find a match.</p>'+
-    '<p><b>⛔ Reserve:</b> Last 2 tiles (2-player) or 1 tile (3-5 player) can never be drawn.</p>'+
-    '<p><b>🐍 Snake Layout:</b> The chain snakes across the table — right, then down, then left, then up, like real dominoes!</p>'+
-    '<p><b>🏆 Win:</b> Empty your hand to win the round. If blocked, fewest pips wins.</p>'+
-    '<p><b>📊 Score:</b> Winner earns sum of opponents\' pips (rounded to nearest 5).</p>'+
-    '<p><b>🔍 Zoom:</b> Pinch, scroll wheel, or use +/- buttons to zoom the table. Drag to pan.</p>'+
+    '<p><b>▶ First Move:</b> Player with the highest double goes first. Tile placed in center.</p>'+
+    '<p><b>🔗 Playing:</b> Match one end of your tile to an open end. Doubles are perpendicular.</p>'+
+    '<p><b>🃏 Drawing:</b> No valid move? Tap the Boneyard to draw.</p>'+
+    '<p><b>⛔ Reserve:</b> Last tiles can never be drawn.</p>'+
+    '<p><b>🌐 Multiplayer:</b> Create a room, share the code, and play with friends in real-time!</p>'+
+    '<p><b>🔍 Zoom:</b> Pinch, scroll wheel, or use +/- buttons. Drag to pan.</p>'+
     '</div>'+
-    '<button class="rulebtn" onclick="document.getElementById(\'rulesmod\').remove()">Got it — Let\'s Play! ✓</button>'+
+    '<button class="rulebtn" onclick="document.getElementById(\'rulesmod\').remove()">Got it! ✓</button>'+
     '</div>';
   document.body.appendChild(m)}
 
@@ -1290,11 +1379,15 @@ function renderDeco(){
 
 /* ── SCREEN MANAGEMENT ── */
 function goMenu(){
-  SFX.click();if(TMR){clearTimeout(TMR);TMR=null}hideSB();SEL=-1;G={};
+  SFX.click();if(TMR){clearTimeout(TMR);TMR=null}hideSB();SEL=-1;
+  if(G.isMultiplayer) mpCleanup();
+  G={};
   var tb=document.getElementById('tbadge');if(tb)tb.classList.add('off');
   document.getElementById('MS').classList.remove('off');
   document.getElementById('GS').classList.add('off');
-  document.getElementById('gov').classList.add('off')}
+  document.getElementById('gov').classList.add('off');
+  document.getElementById('ML').classList.add('off');
+}
 
 function startGame(numBots){
   SFX.click();SFX.shuffle();
@@ -1302,15 +1395,379 @@ function startGame(numBots){
   document.getElementById('MS').classList.add('off');
   document.getElementById('GS').classList.remove('off');
   document.getElementById('gov').classList.add('off');
-  initGame(numBots);
+  document.getElementById('ML').classList.add('off');
+  initGame(numBots, false);
   renderBotZones();renderBoard();renderBoneyard();renderHUD();
   document.getElementById('ph').innerHTML='';
   var tb=document.getElementById('tbadge');if(tb)tb.classList.remove('off');
   var fp=G.players[G.cur];setSt('🃏','Shuffling and dealing tiles…');
   setTimeout(function(){
     renderTurnBadge(fp);
-    setSt(fp.id===0?'🎯':'⏳',fp.id===0?'You hold the highest double — you go first!':fp.emoji+' '+fp.name+' goes first!');
+    setSt(fp.id===0?'🎯':'⏳',fp.id===0?'You hold the highest double — you go first!':fp.name+' goes first!');
     setTimeout(runTurn,1000)},600)}
+
+/* ═══════════════════════════════════════════════════════
+   MULTIPLAYER FUNCTIONS (Firebase Realtime Database)
+   ═══════════════════════════════════════════════════════ */
+
+function generateRoomCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0;i<4;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function openMultiplayerLobby(){
+  SFX.click();
+  document.getElementById('MS').classList.add('off');
+  document.getElementById('ML').classList.remove('off');
+  document.getElementById('room-code-display').textContent = '----';
+  document.getElementById('room-players').innerHTML = '<div class="room-player">Create or join a room</div>';
+  document.getElementById('lobby-status').textContent = 'Create a room or join an existing one';
+  document.getElementById('btn-ready').disabled = true;
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('room-input').value = '';
+  mpPlayerId = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+}
+
+function mpCreateRoom(){
+  if(!window.firebaseDB) { toast('Firebase not loaded. Check console.'); return; }
+  const roomCode = generateRoomCode();
+  const roomRef = window.firebaseRef(window.firebaseDB, 'rooms/' + roomCode);
+  
+  const playerName = 'Player ' + Math.floor(Math.random()*1000);
+  
+  const roomData = {
+    code: roomCode,
+    players: {
+      [mpPlayerId]: {
+        name: playerName,
+        ready: false,
+        hand: [],
+        score: 0,
+        joinedAt: window.firebaseServerTimestamp()
+      }
+    },
+    hostId: mpPlayerId,
+    status: 'waiting',
+    gameState: null,
+    createdAt: window.firebaseServerTimestamp()
+  };
+  
+  window.firebaseSet(roomRef, roomData).then(() => {
+    mpRoomId = roomCode;
+    document.getElementById('room-code-display').textContent = roomCode;
+    document.getElementById('lobby-status').textContent = 'Room created! Share the code: ' + roomCode;
+    document.getElementById('btn-ready').disabled = false;
+    document.getElementById('btn-start').disabled = false;
+    mpListenForPlayers(roomCode);
+    toast('🎲 Room ' + roomCode + ' created!');
+  }).catch(err => {
+    toast('❌ Error: ' + err.message);
+  });
+}
+
+function mpJoinRoom(){
+  const code = document.getElementById('room-input').value.toUpperCase().trim();
+  if(code.length !== 4) { toast('Enter a valid 4-letter code'); return; }
+  
+  const roomRef = window.firebaseRef(window.firebaseDB, 'rooms/' + code);
+  window.firebaseGet(roomRef).then(snapshot => {
+    if(!snapshot.exists()) { toast('❌ Room not found'); return; }
+    const data = snapshot.val();
+    if(data.status !== 'waiting') { toast('❌ Game already started'); return; }
+    if(Object.keys(data.players||{}).length >= 4) { toast('❌ Room is full (max 4 players)'); return; }
+    
+    const playerName = 'Player ' + Math.floor(Math.random()*1000);
+    const updateData = {};
+    updateData['players/' + mpPlayerId] = {
+      name: playerName,
+      ready: false,
+      hand: [],
+      score: 0,
+      joinedAt: window.firebaseServerTimestamp()
+    };
+    
+    window.firebaseUpdate(roomRef, updateData).then(() => {
+      mpRoomId = code;
+      document.getElementById('room-code-display').textContent = code;
+      document.getElementById('lobby-status').textContent = 'Joined room ' + code;
+      document.getElementById('btn-ready').disabled = false;
+      document.getElementById('btn-start').disabled = true;
+      mpListenForPlayers(code);
+      toast('🚪 Joined room ' + code + '!');
+    });
+  }).catch(err => {
+    toast('❌ Error: ' + err.message);
+  });
+}
+
+function mpListenForPlayers(roomCode){
+  // Clean up previous listeners
+  mpCleanupListeners();
+  
+  const roomRef = window.firebaseRef(window.firebaseDB, 'rooms/' + roomCode);
+  const listener = window.firebaseOnValue(roomRef, (snapshot) => {
+    if(!snapshot.exists()) return;
+    const data = snapshot.val();
+    mpUpdateLobbyUI(data);
+    
+    // Check if game started
+    if(data.status === 'playing' && data.gameState) {
+      mpOnGameStarted(data);
+    }
+    
+    // Check if game state updated (during play)
+    if(G && G.isMultiplayer && data.status === 'playing' && data.gameState && data.gameState.cur !== undefined) {
+      mpOnGameStateUpdate(data.gameState);
+    }
+  });
+  
+  mpListeners.push({ref: roomRef, listener: listener});
+}
+
+function mpUpdateLobbyUI(data){
+  const players = data.players || {};
+  const playerList = Object.values(players);
+  const container = document.getElementById('room-players');
+  
+  container.innerHTML = playerList.map(p => 
+    '<div class="room-player joined">🧑 ' + p.name + 
+    (p.ready ? ' ✅' : '') + '</div>'
+  ).join('');
+  
+  document.getElementById('room-code-display').textContent = data.code || '----';
+}
+
+function mpToggleReady(){
+  if(!mpRoomId) return;
+  const roomRef = window.firebaseRef(window.firebaseDB, 'rooms/' + mpRoomId);
+  window.firebaseGet(window.firebaseRef(window.firebaseDB, 'rooms/'+mpRoomId+'/players/'+mpPlayerId+'/ready'))
+    .then(snap => {
+      const currentReady = snap.val() || false;
+      window.firebaseUpdate(roomRef, {
+        ['players/'+mpPlayerId+'/ready']: !currentReady
+      });
+      toast(!currentReady ? '✅ Ready!' : '⏳ Not ready');
+    });
+}
+
+function mpStartGame(){
+  if(!mpRoomId) return;
+  const roomRef = window.firebaseRef(window.firebaseDB, 'rooms/' + mpRoomId);
+  
+  window.firebaseGet(roomRef).then(snapshot => {
+    const data = snapshot.val();
+    const players = data.players || {};
+    const playerCount = Object.keys(players).length;
+    
+    if(playerCount < 2) { toast('Need at least 2 players'); return; }
+    
+    // Initialize game
+    const playerIds = Object.keys(players);
+    const totalPlayers = playerIds.length;
+    const handSize = totalPlayers <= 2 ? 7 : 5;
+    const allTiles = shuffle(genSet());
+    
+    // Build game state
+    const gamePlayers = [];
+    for(let i=0;i<playerIds.length;i++){
+      const pid = playerIds[i];
+      gamePlayers.push({
+        id: i,
+        mpId: pid,
+        name: players[pid].name,
+        hand: allTiles.splice(0, handSize),
+        score: 0,
+        ready: true
+      });
+    }
+    
+    // Find first player (highest double)
+    let first = 0, hd = -1;
+    for(let pi=0;pi<gamePlayers.length;pi++){
+      for(let ti=0;ti<gamePlayers[pi].hand.length;ti++){
+        const t = gamePlayers[pi].hand[ti];
+        if(t.a===t.b && t.a>hd){hd=t.a;first=pi;}
+      }
+    }
+    if(first===-1) first=0;
+    
+    const gameState = {
+      players: gamePlayers,
+      boneyard: allTiles,
+      chain: [],
+      head: {x:BCX,y:BCY,dir:'L',val:null},
+      tail: {x:BCX,y:BCY,dir:'R',val:null},
+      cur: first,
+      isFirst: true,
+      over: false,
+      passStreak: 0,
+      startedAt: Date.now()
+    };
+    
+    window.firebaseUpdate(roomRef, {
+      status: 'playing',
+      gameState: gameState
+    });
+    
+    toast('▶ Game starting!');
+  });
+}
+
+function mpOnGameStarted(data){
+  // Hide lobby, show game
+  document.getElementById('ML').classList.add('off');
+  document.getElementById('GS').classList.remove('off');
+  document.getElementById('gov').classList.add('off');
+  
+  const gs = data.gameState;
+  G = {
+    players: gs.players.map(p => ({...p, bot: false})),
+    boneyard: gs.boneyard,
+    chain: gs.chain || [],
+    head: gs.head || {x:BCX,y:BCY,dir:'L',val:null},
+    tail: gs.tail || {x:BCX,y:BCY,dir:'R',val:null},
+    cur: gs.cur,
+    isFirst: gs.isFirst,
+    over: gs.over,
+    passStreak: gs.passStreak || 0,
+    isMultiplayer: true,
+    numBots: gs.players.length - 1,
+    multiplayerPlayers: gs.players,
+    localPlayerId: gs.players.findIndex(p => p.mpId === mpPlayerId)
+  };
+  
+  if(G.localPlayerId === -1) G.localPlayerId = 0;
+  SEL = -1;
+  resetZoom();
+  renderBotZones();
+  renderBoard();
+  renderBoneyard();
+  renderHUD();
+  document.getElementById('ph').innerHTML = '';
+  
+  var tb = document.getElementById('tbadge');
+  if(tb) tb.classList.remove('off');
+  renderTurnBadge(G.players[G.cur]);
+  setSt('🌐','Multiplayer game started!');
+  
+  runTurn();
+}
+
+function mpOnGameStateUpdate(gameState){
+  if(!G || !G.isMultiplayer) return;
+  
+  // Update game state from server
+  G.chain = gameState.chain || [];
+  G.head = gameState.head;
+  G.tail = gameState.tail;
+  G.cur = gameState.cur;
+  G.isFirst = gameState.isFirst;
+  G.over = gameState.over;
+  G.passStreak = gameState.passStreak;
+  
+  // Update players
+  if(gameState.players){
+    for(let i=0;i<gameState.players.length;i++){
+      if(G.players[i] && gameState.players[i].hand !== undefined){
+        G.players[i].hand = gameState.players[i].hand;
+        G.players[i].score = gameState.players[i].score;
+      }
+    }
+  }
+  G.boneyard = gameState.boneyard || [];
+  
+  renderBoard();
+  renderBoneyard();
+  renderHUD();
+  renderBotHands();
+  
+  // If it's our turn now, show our hand
+  if(G.cur === G.localPlayerId && !G.over) {
+    renderTurnBadge(G.players[G.localPlayerId]);
+    var valid = validMoves(G.players[G.localPlayerId].hand, G.head.val, G.tail.val, G.isFirst);
+    renderHand(valid.length > 0 ? valid : []);
+    setSt('🟡', 'Your turn — tap a glowing tile to play.');
+    setBotThinking(-1, false);
+  } else {
+    document.getElementById('ph').innerHTML = '';
+    renderTurnBadge(G.players[G.cur]);
+    setBotThinking(G.cur, true);
+  }
+  
+  // Check for game over
+  if(gameState.over) {
+    // Find winner
+    for(let i=0;i<G.players.length;i++){
+      if(G.players[i].hand.length === 0) {
+        showGO(i, 0, false);
+        break;
+      }
+    }
+  }
+}
+
+function mpSyncGameState(){
+  if(!mpRoomId || !G.isMultiplayer) return;
+  
+  const roomRef = window.firebaseRef(window.firebaseDB, 'rooms/' + mpRoomId);
+  const gameState = {
+    players: G.players.map(p => ({
+      id: p.id,
+      mpId: p.mpId,
+      name: p.name,
+      hand: p.hand,
+      score: p.score
+    })),
+    boneyard: G.boneyard,
+    chain: G.chain,
+    head: G.head,
+    tail: G.tail,
+    cur: G.cur,
+    isFirst: G.isFirst,
+    over: G.over,
+    passStreak: G.passStreak
+  };
+  
+  window.firebaseUpdate(roomRef, { gameState: gameState });
+}
+
+function mpCleanupListeners(){
+  mpListeners.forEach(l => {
+    if(l.listener && l.ref) window.firebaseOff(l.ref, 'value', l.listener);
+  });
+  mpListeners = [];
+}
+
+function mpCleanup(){
+  mpCleanupListeners();
+  if(mpRoomId && mpPlayerId) {
+    const roomRef = window.firebaseRef(window.firebaseDB, 'rooms/' + mpRoomId);
+    window.firebaseUpdate(roomRef, { ['players/'+mpPlayerId]: null }).then(() => {
+      // Check if room is empty, delete it
+      window.firebaseGet(roomRef).then(snap => {
+        if(snap.exists()){
+          const data = snap.val();
+          const players = data.players || {};
+          if(Object.keys(players).length === 0){
+            window.firebaseSet(roomRef, null);
+          }
+        }
+      });
+    });
+  }
+  mpRoomId = null;
+  mpPlayerId = null;
+  isMultiplayer = false;
+}
+
+function mpLeaveLobby(){
+  SFX.click();
+  mpCleanup();
+  document.getElementById('ML').classList.add('off');
+  document.getElementById('MS').classList.remove('off');
+}
 
 /* ── LOADING ── */
 (function(){
@@ -1323,9 +1780,6 @@ function startGame(numBots){
     if(pct>=100){clearInterval(iv);setTimeout(function(){
       document.getElementById('LS').classList.add('off');
       document.getElementById('MS').classList.remove('off');renderDeco()},340)}},58)})();
-
-/* ── BCX/BCY used by layout engine ── */
-var BCX=2500,BCY=1500;
 </script>
 </body>
 </html>
