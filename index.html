@@ -606,15 +606,16 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
   import { getDatabase, ref, set, get, update, onValue, off, push, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
   
-  const firebaseConfig = {
-    apiKey: "AIzaSyBaNjHmi-VlW8aFDDVN38OJkQCShYY2sFg",
-    authDomain: "dominos-ftw.firebaseapp.com",
-    projectId: "dominos-ftw",
-    storageBucket: "dominos-ftw.firebasestorage.app",
-    messagingSenderId: "476741872461",
-    appId: "1:476741872461:web:3dc979b05a6175eadda504",
-    measurementId: "G-1TBL91595F"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBaNjHmi-VlW8aFDDVN38OJkQCShYY2sFg",
+  authDomain: "dominos-ftw.firebaseapp.com",
+  databaseURL: "https://dominos-ftw-default-rtdb.europe-west1.firebasedatabase.app", // ADD THIS LINE
+  projectId: "dominos-ftw",
+  storageBucket: "dominos-ftw.firebasestorage.app",
+  messagingSenderId: "476741872461",
+  appId: "1:476741872461:web:3dc979b05a6175eadda504",
+  measurementId: "G-1TBL91595F"
+};
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
@@ -753,7 +754,7 @@ var BZ_SLOTS={1:['bz0'],2:['bz0','bz2'],3:['bz0','bz1','bz2'],4:['bz3','bz0','bz
 
 function genSet(){var t=[];for(var a=0;a<=6;a++)for(var b=a;b<=6;b++)t.push({a:a,b:b});return t}
 function shuffle(arr){for(var i=arr.length-1;i>0;i--){var j=0|Math.random()*(i+1);var tmp=arr[i];arr[i]=arr[j];arr[j]=tmp}return arr}
-function pip(t){return t?a+b:0}
+function pip(t){return t?t.a+t.b:0}
 function hpip(p){return p.hand.reduce(function(s,t){return s+pip(t)},0)}
 
 /* ── GLOBAL STATE ── */
