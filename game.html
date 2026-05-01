@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Dominoes - Game</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<canvas id="pcv"></canvas>
+
+<!-- GAME SCREEN -->
+<div id="GS" class="sc">
+  <!-- Corner decorations -->
+  <div class="fcorn fc-tl">
+    <svg viewBox="0 0 70 70" fill="none">
+      <path d="M0 70 Q0 0 70 0" stroke="rgba(201,168,76,.55)" stroke-width="1.5" fill="none"/>
+      <circle cx="7" cy="7" r="2.5" fill="rgba(201,168,76,.35)"/>
+    </svg>
+  </div>
+  <div class="fcorn fc-tr">
+    <svg viewBox="0 0 70 70" fill="none">
+      <path d="M0 70 Q0 0 70 0" stroke="rgba(201,168,76,.55)" stroke-width="1.5" fill="none"/>
+      <circle cx="7" cy="7" r="2.5" fill="rgba(201,168,76,.35)"/>
+    </svg>
+  </div>
+  <div class="fcorn fc-bl">
+    <svg viewBox="0 0 70 70" fill="none">
+      <path d="M0 70 Q0 0 70 0" stroke="rgba(201,168,76,.55)" stroke-width="1.5" fill="none"/>
+      <circle cx="7" cy="7" r="2.5" fill="rgba(201,168,76,.35)"/>
+    </svg>
+  </div>
+  <div class="fcorn fc-br">
+    <svg viewBox="0 0 70 70" fill="none">
+      <path d="M0 70 Q0 0 70 0" stroke="rgba(201,168,76,.55)" stroke-width="1.5" fill="none"/>
+      <circle cx="7" cy="7" r="2.5" fill="rgba(201,168,76,.35)"/>
+    </svg>
+  </div>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="hud-title">DOMINOES</div>
+    <div id="hscores"></div>
+    <div class="hbtns">
+      <button class="hbtn" id="hbtn-friends" onclick="toggleFriendsPanel()">👥</button>
+      <button class="hbtn" id="hbtn-spectate" onclick="openSpectateList()" style="display:none">👁️</button>
+      <button class="hbtn" id="hbtn-snd" onclick="toggleSound()">🔊</button>
+      <button class="hbtn" id="hbtn-menu" onclick="goMenu()">↩ Menu</button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Button -->
+  <button id="fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+
+  <!-- Timer Bar -->
+  <div id="timer-bar-wrap" class="off">
+    <div id="timer-bar"></div>
+  </div>
+
+  <!-- Turn Badge -->
+  <div id="tbadge" class="off yours">
+    <div class="tbdot"></div>
+    <span id="tbadge-txt">YOUR TURN</span>
+  </div>
+
+  <!-- Table Area -->
+  <div id="table">
+    <!-- Bot Zones -->
+    <div id="bz0" class="bz" style="display:none"></div>
+    <div id="bz1" class="bz" style="display:none"></div>
+    <div id="bz2" class="bz" style="display:none"></div>
+    <div id="bz3" class="bz" style="display:none"></div>
+
+    <!-- Board Viewport -->
+    <div id="bvp">
+      <div id="bcanvas">
+        <div id="board"></div>
+      </div>
+    </div>
+
+    <!-- Zoom Controls -->
+    <div id="zoom-ctrl">
+      <button class="zb" onclick="doZoom(1.2)" title="Zoom In">+</button>
+      <div id="zoom-pct">100%</div>
+      <button class="zb" onclick="doZoom(0.833)" title="Zoom Out">−</button>
+      <button class="zb" onclick="resetZoom()" title="Reset Zoom" style="font-size:.7rem">⌂</button>
+    </div>
+
+    <!-- Boneyard -->
+    <div id="byw">
+      <div id="byp" onclick="playerDraw()">
+        <div class="bycard" style="top:7px;left:4px;transform:rotate(4deg);opacity:.62"></div>
+        <div class="bycard" style="top:3.5px;left:2px;transform:rotate(-2deg);opacity:.8"></div>
+        <div class="bycard"></div>
+      </div>
+      <div id="by-count">28</div>
+      <div id="by-label">Boneyard</div>
+    </div>
+  </div>
+
+  <!-- Voice Chat Controls -->
+  <div id="voice-controls" class="off">
+    <button class="voice-btn" id="voice-mute-btn" onclick="toggleVoiceMute()" title="Mute/Unmute">🎤</button>
+  </div>
+
+  <!-- Emoji Picker -->
+  <div id="emoji-picker" class="off">
+    <button class="emoji-btn" onclick="sendEmoji('😂')">😂</button>
+    <button class="emoji-btn" onclick="sendEmoji('🔥')">🔥</button>
+    <button class="emoji-btn" onclick="sendEmoji('😱')">😱</button>
+    <button class="emoji-btn" onclick="sendEmoji('👏')">👏</button>
+    <button class="emoji-btn" onclick="sendEmoji('💀')">💀</button>
+    <button class="emoji-btn" onclick="sendEmoji('🎯')">🎯</button>
+  </div>
+
+  <!-- Skin Selector -->
+  <div id="skin-selector" class="off">
+    <div class="skin-dot classic active" onclick="selectSkin('classic')" title="Classic"></div>
+    <div class="skin-dot midnight" onclick="selectSkin('midnight')" title="Midnight"></div>
+    <div class="skin-dot forest" onclick="selectSkin('forest')" title="Forest"></div>
+    <div class="skin-dot ruby" onclick="selectSkin('ruby')" title="Ruby"></div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="statwrap">
+    <div id="stat">
+      <span id="stat-ic">⏳</span>
+      <span id="stat-txt">Setting up…</span>
+    </div>
+  </div>
+
+  <!-- Side Selection Bar -->
+  <div id="sbar" class="off">
+    <span class="sblbl">Play to:</span>
+    <button class="sbtn sbL" id="sbL" onclick="doSide('L')">◀ Left</button>
+    <button class="sbtn sbR" id="sbR" onclick="doSide('R')">Right ▶</button>
+    <button class="sbtn sbX" onclick="cancelSide()">✕</button>
+  </div>
+
+  <!-- Rematch Bar -->
+  <div id="rematch-bar" class="off">
+    <span class="rematch-status" id="rematch-status"></span>
+    <button class="rematch-btn rematch-accept" onclick="mpAcceptRematch()">🔄 Rematch</button>
+    <button class="rematch-btn rematch-decline" onclick="mpDeclineRematch()">✕ Leave</button>
+  </div>
+
+  <!-- Player Hand -->
+  <div id="phw">
+    <div id="ph-label">YOUR HAND — tap or drag a glowing tile to play</div>
+    <div id="ph"></div>
+  </div>
+
+  <!-- Stats Button (at bottom) -->
+  <button id="stats-btn" onclick="openStats()">📊 Stats</button>
+
+  <!-- Friends Panel -->
+  <div id="friends-panel">
+    <h3>👥 Friends</h3>
+    <div class="friend-add-row">
+      <input type="text" id="friend-name-input" placeholder="Add by username...">
+      <button onclick="addFriend()">+</button>
+    </div>
+    <div id="friends-list">
+      <p style="font-size:.65rem;color:var(--txt-dim);text-align:center">No friends added yet</p>
+    </div>
+  </div>
+  <button id="friends-toggle-btn" onclick="toggleFriendsPanel()">👥</button>
+</div>
+
+<!-- GAME OVER SCREEN -->
+<div id="gov" class="off">
+  <div id="goc">
+    <canvas id="cnfc"></canvas>
+    <span id="go-trophy">🏆</span>
+    <div id="go-title">DOMINO!</div>
+    <div id="go-msg"></div>
+    <div class="godiv"></div>
+    <div id="go-sc"></div>
+    <button class="gobtn" id="go-primary-btn" onclick="goMenu()">Play Again</button>
+    <button class="gobtn secondary" id="go-rematch-btn" onclick="mpRequestRematch()" style="display:none">🔄 Request Rematch</button>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toasts"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+  import { getDatabase, ref, set, get, update, onValue, off, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
+  
+  const firebaseConfig = {
+    apiKey: "AIzaSyBaNjHmi-VlW8aFDDVN38OJkQCShYY2sFg",
+    authDomain: "dominos-ftw.firebaseapp.com",
+    databaseURL: "https://dominos-ftw-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "dominos-ftw",
+    storageBucket: "dominos-ftw.firebasestorage.app",
+    messagingSenderId: "476741872461",
+    appId: "1:476741872461:web:3dc979b05a6175eadda504",
+    measurementId: "G-1TBL91595F"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  
+  window.firebaseDB = db;
+  window.firebaseRef = ref;
+  window.firebaseSet = set;
+  window.firebaseGet = get;
+  window.firebaseUpdate = update;
+  window.firebaseOnValue = onValue;
+  window.firebaseOff = off;
+  window.firebaseServerTimestamp = serverTimestamp;
+  window.firebaseOnDisconnect = onDisconnect;
+  
+  console.log('🔥 Firebase initialized - Game');
+</script>
+
+<script src="script.js"></script>
+</body>
+</html>
