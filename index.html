@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>Dominoes</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;500;600;700&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -55,6 +56,7 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
   50%{filter:drop-shadow(0 3px 40px rgba(201,168,76,.9))}}
 .logo p{font-size:clamp(.6rem,1.8vw,.78rem);letter-spacing:.32em;text-transform:uppercase;
   color:rgba(232,201,109,.4);margin-top:5px}
+.logo-img{width:120px;height:auto;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(201,168,76,.7));}
 #deco{display:flex;gap:5px;justify-content:center;position:relative;z-index:1;
   animation:sUp .7s ease .22s both}
 @keyframes sUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
@@ -137,6 +139,7 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
 .uname-box{background:linear-gradient(148deg,#1b4826,#0d2414);border:2px solid var(--gold);
   border-radius:20px;padding:30px;text-align:center;max-width:380px;width:92vw;
   box-shadow:0 30px 80px rgba(0,0,0,.84)}
+.uname-box img{width:100px;margin-bottom:15px;filter:drop-shadow(0 0 20px rgba(201,168,76,.7));}
 .uname-box h2{font-family:var(--F);font-size:1.5rem;color:var(--gold-l);margin-bottom:6px}
 .uname-box p{font-size:.78rem;color:var(--txt-dim);margin-bottom:14px}
 .uname-box input{width:100%;padding:11px;background:rgba(0,0,0,.4);border:1.5px solid rgba(201,168,76,.3);
@@ -533,6 +536,7 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
 <!-- USERNAME MODAL -->
 <div id="username-modal" class="off">
   <div class="uname-box">
+    <img src="logo.svg" alt="Dominoes Logo">
     <h2>Welcome to Dominoes!</h2>
     <p>Choose your domino nickname</p>
     <input type="text" id="uname-input" placeholder="Your name..." maxlength="16" autocomplete="off">
@@ -549,7 +553,11 @@ canvas#pcv{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.28}
 
 <!-- MENU -->
 <div id="MS" class="sc off">
-  <div class="logo"><h1>DOMINOES</h1><p>Classic Double-Six · Draw Game</p></div>
+  <div class="logo">
+    <img src="logo.svg" alt="Dominoes" class="logo-img" style="width:130px;height:auto;">
+    <h1>DOMINOES</h1>
+    <p>Classic Double-Six · Draw Game</p>
+  </div>
   <div id="deco"></div>
   <div class="mp">
     <div class="mlbl" id="welcome-label">Welcome</div>
@@ -904,7 +912,6 @@ function saveUsername(){
   localStorage.setItem('domino_username', USERNAME);
   localStorage.setItem('domino_player_id', PLAYER_ID);
   if(window.firebaseDB){
-    // Store in Firebase for persistence across devices
     var profileRef = window.firebaseRef(window.firebaseDB, 'players/' + PLAYER_ID + '/profile');
     window.firebaseSet(profileRef, {name: USERNAME, lastSeen: window.firebaseServerTimestamp()});
   }
@@ -918,7 +925,6 @@ function showMenu(){
   document.getElementById('MS').classList.remove('off');
   document.getElementById('welcome-label').textContent = 'Welcome, ' + USERNAME + '!';
   renderDeco();
-  // Check URL hash for deep linking
   checkHashRoute();
 }
 
@@ -1038,37 +1044,100 @@ function placeChain(player,tIdx,side){
   renderBoard();renderHUD();
   stopTimer();
 
-  // All Fives scoring during play
   if(G.variant==='allfives'&&!G.isFirst&&G.head.val!==null&&G.tail.val!==null){
     var es=G.head.val+G.tail.val;
     if(es>0&&es%5===0){var pts=es;player.score+=pts;scorePop(pts);renderHUD()}
   }
 }
 
-// [snake layout functions: attachToTail, advanceTail, attachToHead, advanceHead - same as before]
 function attachToTail(rA,rB,dbl){
   var end=G.tail,dir=end.dir,tw,th,nx,ny;
-  if(dbl){tw=DW;th=DH;if(dir==='R'||dir==='L'){nx=end.x;ny=end.y-DH/2}else{tw=DH;th=DW;nx=end.x-DH/2;ny=end.y}advanceTail(dir,tw,th,nx,ny)}
-  else{if(dir==='R'){tw=TW;th=TH;nx=end.x;ny=end.y-TH/2}else if(dir==='L'){tw=TW;th=TH;nx=end.x-TW;ny=end.y-TH/2}else if(dir==='D'){tw=TH;th=TW;nx=end.x-TH/2;ny=end.y}else{tw=TH;th=TW;nx=end.x-TH/2;ny=end.y-TW}advanceTail(dir,tw,th,nx,ny)}
+  if(dbl){
+    tw=DW;th=DH;
+    if(dir==='R'||dir==='L'){
+      nx=end.x;ny=end.y-DH/2;
+    } else {
+      tw=DH;th=DW;
+      nx=end.x-DH/2;ny=end.y;
+    }
+    advanceTail(dir,tw,th,nx,ny);
+  } else {
+    if(dir==='R'){tw=TW;th=TH;nx=end.x;ny=end.y-TH/2;}
+    else if(dir==='L'){tw=TW;th=TH;nx=end.x-TW;ny=end.y-TH/2;}
+    else if(dir==='D'){tw=TH;th=TW;nx=end.x-TH/2;ny=end.y;}
+    else{tw=TH;th=TW;nx=end.x-TH/2;ny=end.y-TW;}
+    advanceTail(dir,tw,th,nx,ny);
+  }
   return{a:rA,b:rB,x:nx,y:ny,w:tw,h:th,dbl:dbl,dir:dir,side:'tail'};
 }
+
 function advanceTail(dir,tw,th,nx,ny){
-  if(dir==='R'){if(nx+tw>BCX+SNAKE_W){G.tail={x:nx+tw/2,y:ny+th,dir:'D',val:G.tail.val};return}G.tail={x:nx+tw,y:ny+th/2,dir:dir,val:G.tail.val}}
-  else if(dir==='L'){if(nx<BCX-SNAKE_W){G.tail={x:nx+tw/2,y:ny,dir:'U',val:G.tail.val};return}G.tail={x:nx,y:ny+th/2,dir:dir,val:G.tail.val}}
-  else if(dir==='D'){if(ny+th>BCY+SNAKE_H){G.tail={x:nx,y:ny+th/2,dir:'L',val:G.tail.val}}else{G.tail={x:nx+tw/2,y:ny+th,dir:dir,val:G.tail.val}}}
-  else{if(ny<BCY-SNAKE_H){G.tail={x:nx+tw,y:ny+th/2,dir:'R',val:G.tail.val}}else{G.tail={x:nx+tw/2,y:ny,dir:dir,val:G.tail.val}}}
+  if(dir==='R'){
+    if(nx+tw>BCX+SNAKE_W){
+      G.tail={x:nx+tw/2,y:ny+th,dir:'D',val:G.tail.val};return;
+    }
+    G.tail={x:nx+tw,y:ny+th/2,dir:dir,val:G.tail.val};
+  } else if(dir==='L'){
+    if(nx<BCX-SNAKE_W){
+      G.tail={x:nx+tw/2,y:ny,dir:'U',val:G.tail.val};return;
+    }
+    G.tail={x:nx,y:ny+th/2,dir:dir,val:G.tail.val};
+  } else if(dir==='D'){
+    if(ny+th>BCY+SNAKE_H){
+      G.tail={x:nx,y:ny+th/2,dir:'L',val:G.tail.val};
+    } else {
+      G.tail={x:nx+tw/2,y:ny+th,dir:dir,val:G.tail.val};
+    }
+  } else {
+    if(ny<BCY-SNAKE_H){
+      G.tail={x:nx+tw,y:ny+th/2,dir:'R',val:G.tail.val};
+    } else {
+      G.tail={x:nx+tw/2,y:ny,dir:dir,val:G.tail.val};
+    }
+  }
 }
+
 function attachToHead(rA,rB,dbl){
   var end=G.head,dir=end.dir,tw,th,nx,ny;
-  if(dbl){tw=DW;th=DH;if(dir==='L'||dir==='R'){nx=end.x-DW;ny=end.y-DH/2}else{tw=DH;th=DW;nx=end.x-DH/2;ny=end.y-DW}advanceHead(dir,tw,th,nx,ny)}
-  else{if(dir==='L'){tw=TW;th=TH;nx=end.x-TW;ny=end.y-TH/2}else if(dir==='R'){tw=TW;th=TH;nx=end.x;ny=end.y-TH/2}else if(dir==='U'){tw=TH;th=TW;nx=end.x-TH/2;ny=end.y-TW}else{tw=TH;th=TW;nx=end.x-TH/2;ny=end.y}advanceHead(dir,tw,th,nx,ny)}
+  if(dbl){
+    tw=DW;th=DH;
+    if(dir==='L'||dir==='R'){nx=end.x-DW;ny=end.y-DH/2;}
+    else{tw=DH;th=DW;nx=end.x-DH/2;ny=end.y-DW;}
+    advanceHead(dir,tw,th,nx,ny);
+  } else {
+    if(dir==='L'){tw=TW;th=TH;nx=end.x-TW;ny=end.y-TH/2;}
+    else if(dir==='R'){tw=TW;th=TH;nx=end.x;ny=end.y-TH/2;}
+    else if(dir==='U'){tw=TH;th=TW;nx=end.x-TH/2;ny=end.y-TW;}
+    else{tw=TH;th=TW;nx=end.x-TH/2;ny=end.y;}
+    advanceHead(dir,tw,th,nx,ny);
+  }
   return{a:rA,b:rB,x:nx,y:ny,w:tw,h:th,dbl:dbl,dir:dir,side:'head'};
 }
+
 function advanceHead(dir,tw,th,nx,ny){
-  if(dir==='L'){if(nx<BCX-SNAKE_W){G.head={x:nx+tw/2,y:ny,dir:'U',val:G.head.val};return}G.head={x:nx,y:ny+th/2,dir:dir,val:G.head.val}}
-  else if(dir==='R'){if(nx+tw>BCX+SNAKE_W){G.head={x:nx+tw/2,y:ny+th,dir:'D',val:G.head.val};return}G.head={x:nx+tw,y:ny+th/2,dir:dir,val:G.head.val}}
-  else if(dir==='U'){if(ny<BCY-SNAKE_H){G.head={x:nx+tw,y:ny+th/2,dir:'R',val:G.head.val}}else{G.head={x:nx+tw/2,y:ny,dir:dir,val:G.head.val}}}
-  else{if(ny+th>BCY+SNAKE_H){G.head={x:nx,y:ny+th/2,dir:'L',val:G.head.val}}else{G.head={x:nx+tw/2,y:ny+th,dir:dir,val:G.head.val}}}
+  if(dir==='L'){
+    if(nx<BCX-SNAKE_W){
+      G.head={x:nx+tw/2,y:ny,dir:'U',val:G.head.val};return;
+    }
+    G.head={x:nx,y:ny+th/2,dir:dir,val:G.head.val};
+  } else if(dir==='R'){
+    if(nx+tw>BCX+SNAKE_W){
+      G.head={x:nx+tw/2,y:ny+th,dir:'D',val:G.head.val};return;
+    }
+    G.head={x:nx+tw,y:ny+th/2,dir:dir,val:G.head.val};
+  } else if(dir==='U'){
+    if(ny<BCY-SNAKE_H){
+      G.head={x:nx+tw,y:ny+th/2,dir:'R',val:G.head.val};
+    } else {
+      G.head={x:nx+tw/2,y:ny,dir:dir,val:G.head.val};
+    }
+  } else {
+    if(ny+th>BCY+SNAKE_H){
+      G.head={x:nx,y:ny+th/2,dir:'L',val:G.head.val};
+    } else {
+      G.head={x:nx+tw/2,y:ny+th,dir:dir,val:G.head.val};
+    }
+  }
 }
 
 /* ── VALID MOVES ── */
@@ -1089,7 +1158,7 @@ function botMove(p){
     for(var si=0;si<sides.length;si++){
       var sc=pip(t)*9+(dbl?7:0),newOpen=G.isFirst?t.b:(sides[si]==='L'?(t.a===oL?t.b:t.a):(t.a===oR?t.b:t.a));
       if(newOpen===6||newOpen===0)sc-=4;
-      if(G.variant==='block')sc+=(dbl?15:0); // Prefer doubles in block game
+      if(G.variant==='block')sc+=(dbl?15:0);
       if(sc>bestSc){bestSc=sc;best={idx:idx,side:sides[si]}}}}
   if(best){placeChain(p,best.idx,best.side);return true}return false}
 
@@ -1110,7 +1179,6 @@ function rnd5(n){return Math.round(n/5)*5}
 function endHand(winIdx,blocked){
   G.over=true;STATS.roundsPlayed++;var w=G.players[winIdx],bonus;
   if(G.variant==='allfives'){
-    // All Fives: winner gets sum of opponents pips (rounded to 5), plus whatever they scored during play
     var opp=0;for(var i=0;i<G.players.length;i++)if(i!==winIdx)opp+=hpip(G.players[i]);bonus=rnd5(opp);
   }else if(blocked){var mine=hpip(w),all=G.players.reduce(function(s,p){return s+hpip(p)},0);bonus=rnd5(all-mine)}
   else{var opp2=0;for(var i2=0;i2<G.players.length;i2++)if(i2!==winIdx)opp2+=hpip(G.players[i2]);bonus=rnd5(opp2)}
@@ -1230,7 +1298,7 @@ function renderBotZones(){
   for(var zi=0;zi<BZ_IDS.length;zi++){var z=document.getElementById(BZ_IDS[zi]);if(z)z.style.display='none'}
   var slots=BZ_SLOTS[Math.max(1,(G.players?G.players.length-1:1))]||['bz0'],slotIdx=0;
   for(var b=0;b<(G.players||[]).length;b++){if(b===G.localPlayerId)continue;var p=G.players[b],zid=slots[slotIdx],zone=document.getElementById(zid);if(!zone||!p||slotIdx>=slots.length)continue;zone.style.cssText='display:flex;'+BZ_STYLES[zid];zone.innerHTML='<div class="bzav" id="av-'+p.id+'">'+p.emoji+'</div><div class="bzinfo"><div class="bzname" id="bn-'+p.id+'">'+p.name+'</div><div class="bzcnt" id="bc-'+p.id+'">'+p.hand.length+' tiles</div></div><div class="bzh" id="bh-'+p.id+'"></div>';fillBotHand(p);slotIdx++}}
-  
+}
 function renderBotHands(){for(var i=0;i<G.players.length;i++){var p=G.players[i];if(i===G.localPlayerId)continue;var bn=document.getElementById('bn-'+p.id),bc=document.getElementById('bc-'+p.id);if(bn)bn.firstChild.nodeValue=p.name;if(bc)bc.textContent=p.hand.length+' tiles';fillBotHand(p)}}
 function fillBotHand(p){var hel=document.getElementById('bh-'+p.id);if(!hel)return;hel.innerHTML='';for(var i=0;i<p.hand.length;i++){var b=document.createElement('div');b.className='btbk';hel.appendChild(b)}}
 function setBotThinking(pid,show){for(var i=0;i<G.players.length;i++){var p=G.players[i],av=document.getElementById('av-'+p.id),bn=document.getElementById('bn-'+p.id);if(av){if(show&&p.id===pid)av.classList.add('on');else av.classList.remove('on')}if(bn){var td=bn.querySelector('.tdots');if(show&&p.id===pid){if(!td){var d=document.createElement('span');d.className='tdots';d.innerHTML='<span></span><span></span><span></span>';bn.appendChild(d)}}else if(td)td.remove()}}}
@@ -1340,7 +1408,6 @@ function mpCreateRoom(){
     mpRoomId=roomCode;document.getElementById('room-code-display').textContent=roomCode;document.getElementById('lobby-status').textContent='Room created! Share the code: '+roomCode;document.getElementById('btn-ready').disabled=false;document.getElementById('btn-start').disabled=false;document.getElementById('copy-btn').style.display='inline-block';
     window.location.hash='room='+roomCode;
     mpListenForPlayers(roomCode);toast('🎲 Room '+roomCode+' created!');
-    // Set disconnect cleanup with 30-second grace period
     window.firebaseOnDisconnect(window.firebaseRef(window.firebaseDB,'rooms/'+roomCode+'/players/'+mpPlayerId)).remove();
   }).catch(function(err){toast('❌ Error: '+err.message)});
 }
@@ -1380,13 +1447,8 @@ function mpListenForPlayers(roomCode){
     if(data.status==='playing'&&data.gameState){
       if(isSpectator||G.isMultiplayer)mpOnGameStateUpdate(data.gameState,data);
     }
-    // Handle rematch
     if(data.rematchRequestedBy&&data.rematchResponses){
       handleRematchUI(data);
-    }
-    // Handle reactions
-    if(data.reactions&&isSpectator){
-      // Reactions handled by pushing to array
     }
   });
   mpListeners.push({ref:roomRef,listener:listener});
@@ -1430,7 +1492,6 @@ function mpOnGameStateUpdate(gameState,roomData){
   renderBoard();renderBoneyard();renderHUD();renderBotHands();
   if(G.cur===G.localPlayerId&&!G.over){renderTurnBadge(G.players[G.localPlayerId]);var valid=validMoves(G.players[G.localPlayerId].hand,G.head.val,G.tail.val,G.isFirst);renderHand(valid.length>0?valid:[]);setSt('🟡','Your turn — tap a glowing tile to play.');setBotThinking(-1,false);startTimer()}else{document.getElementById('ph').innerHTML='';renderTurnBadge(G.players[G.cur]);setBotThinking(G.cur,true);stopTimer()}
   if(gameState.over){stopTimer();for(var j=0;j<G.players.length;j++){if(G.players[j].hand.length===0){showGO(j,0,false);break}}}
-  // Handle rematch
   if(roomData&&roomData.rematchRequestedBy)handleRematchUI(roomData);
 }
 
@@ -1442,7 +1503,6 @@ function handleRematchUI(data){
   } else {
     bar.classList.remove('off');document.getElementById('rematch-status').textContent='Rematch requested!';
   }
-  // Check if all accepted
   if(data.rematchResponses&&data.players){
     var playerIds=Object.keys(data.players);var allAccepted=true;
     for(var i=0;i<playerIds.length;i++){if(playerIds[i]!==data.rematchRequestedBy&&!data.rematchResponses[playerIds[i]]){allAccepted=false;break}}
