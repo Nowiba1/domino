@@ -1230,7 +1230,7 @@ function renderBotZones(){
   for(var zi=0;zi<BZ_IDS.length;zi++){var z=document.getElementById(BZ_IDS[zi]);if(z)z.style.display='none'}
   var slots=BZ_SLOTS[Math.max(1,(G.players?G.players.length-1:1))]||['bz0'],slotIdx=0;
   for(var b=0;b<(G.players||[]).length;b++){if(b===G.localPlayerId)continue;var p=G.players[b],zid=slots[slotIdx],zone=document.getElementById(zid);if(!zone||!p||slotIdx>=slots.length)continue;zone.style.cssText='display:flex;'+BZ_STYLES[zid];zone.innerHTML='<div class="bzav" id="av-'+p.id+'">'+p.emoji+'</div><div class="bzinfo"><div class="bzname" id="bn-'+p.id+'">'+p.name+'</div><div class="bzcnt" id="bc-'+p.id+'">'+p.hand.length+' tiles</div></div><div class="bzh" id="bh-'+p.id+'"></div>';fillBotHand(p);slotIdx++}}
-}
+  
 function renderBotHands(){for(var i=0;i<G.players.length;i++){var p=G.players[i];if(i===G.localPlayerId)continue;var bn=document.getElementById('bn-'+p.id),bc=document.getElementById('bc-'+p.id);if(bn)bn.firstChild.nodeValue=p.name;if(bc)bc.textContent=p.hand.length+' tiles';fillBotHand(p)}}
 function fillBotHand(p){var hel=document.getElementById('bh-'+p.id);if(!hel)return;hel.innerHTML='';for(var i=0;i<p.hand.length;i++){var b=document.createElement('div');b.className='btbk';hel.appendChild(b)}}
 function setBotThinking(pid,show){for(var i=0;i<G.players.length;i++){var p=G.players[i],av=document.getElementById('av-'+p.id),bn=document.getElementById('bn-'+p.id);if(av){if(show&&p.id===pid)av.classList.add('on');else av.classList.remove('on')}if(bn){var td=bn.querySelector('.tdots');if(show&&p.id===pid){if(!td){var d=document.createElement('span');d.className='tdots';d.innerHTML='<span></span><span></span><span></span>';bn.appendChild(d)}}else if(td)td.remove()}}}
