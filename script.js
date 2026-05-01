@@ -2204,10 +2204,15 @@ function mpUpdateLobbyUI(data) {
   var players = data.players || {};
   var playerList = Object.values(players);
   var container = document.getElementById('room-players');
-  container.innerHTML = playerList.map(function(p) {
-    return '<div class="room-player joined">🧑 ' + p.name + (p.ready ? ' ✅' : '') + '</div>';
-  }).join('');
-  document.getElementById('room-code-display').textContent = data.code || '----';
+  if (container) {
+    container.innerHTML = playerList.map(function(p) {
+      return '<div class="room-player joined">🧑 ' + p.name + (p.ready ? ' ✅' : '') + '</div>';
+    }).join('');
+  }
+  var roomCodeDisplay = document.getElementById('room-code-display');
+  if (roomCodeDisplay) {
+    roomCodeDisplay.innerHTML = (data.code || '----') + '<button class="copy-btn" onclick="copyRoomCode()" id="copy-btn" style="display:inline-block">📋</button>';
+  }
 }
 
 function mpToggleReady() {
