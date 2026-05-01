@@ -529,14 +529,32 @@ function initUsername() {
   if (savedSkin) currentSkin = savedSkin;
   loadFriends();
   
+  var path = window.location.pathname;
+  var isIndexPage = (path.includes('index.html') || path === '/' || path === '' || !path.includes('.html'));
+  
   if (saved && savedId) {
     USERNAME = saved;
     PLAYER_ID = savedId;
     var modal = document.getElementById('username-modal');
     if (modal) modal.classList.add('off');
-    showMenu();
+    if (isIndexPage) {
+      showMenu();
+    } else {
+      checkPageContext();
+    }
     return;
   }
+  
+  if (!isIndexPage) {
+    // On non-index pages without username, redirect to index
+    USERNAME = 'Player';
+    PLAYER_ID = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+    localStorage.setItem('domino_username', USERNAME);
+    localStorage.setItem('domino_player_id', PLAYER_ID);
+    checkPageContext();
+    return;
+  }
+  
   PLAYER_ID = 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
   var modal = document.getElementById('username-modal');
   if (modal) modal.classList.remove('off');
@@ -577,14 +595,9 @@ function showMenu() {
   if (welcomeLabel) welcomeLabel.textContent = 'Welcome, ' + USERNAME + '!';
   renderDeco();
   checkHashRoute();
-  checkPageContext();
 }
 
 function checkPageContext() {
-  // Prevent redirect loops
-  if (window._pageContextChecked) return;
-  window._pageContextChecked = true;
-  
   var path = window.location.pathname;
   var params = new URLSearchParams(window.location.search);
   
@@ -606,16 +619,16 @@ function checkPageContext() {
     }
   }
   
-   // If on lobby.html, check for room param or auto-create
+  // If on lobby.html, check for room param or auto-create
   if (path.includes('lobby.html')) {
     var lobbyRoom = params.get('room');
     var lobbyVariant = params.get('variant') || 'draw';
     mpVariant = lobbyVariant;
+    if (!mpPlayerId) mpPlayerId = PLAYER_ID || ('player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
     if (lobbyRoom) {
       mpRoomId = lobbyRoom;
       setTimeout(function() { rejoinLobby(lobbyRoom); }, 500);
     } else {
-      if (!mpPlayerId) mpPlayerId = PLAYER_ID || ('player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5));
       setTimeout(function() { mpCreateRoom(); }, 400);
     }
     return;
@@ -632,7 +645,6 @@ function checkPageContext() {
     return;
   }
 }
-
 function checkHashRoute() {
   var hash = window.location.hash;
   if (!hash) return;
