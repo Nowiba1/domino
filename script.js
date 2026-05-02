@@ -465,14 +465,14 @@ function saveUsername() {
 }
 
 function showMenu() {
-  var ls = document.getElementById('LS');
-  var ms = document.getElementById('MS');
-  if (ls) ls.classList.add('off');
-  if (ms) ms.classList.remove('off');
-  var wl = document.getElementById('welcome-label');
-  if (wl) wl.textContent = 'Welcome, ' + USERNAME + '!';
-  renderDeco();
-  checkHashRoute();
+    var ls = document.getElementById("LS"),
+        ms = document.getElementById("MS");
+    if (ls) ls.classList.add("off");
+    if (ms) ms.classList.remove("off");
+    var wl = document.getElementById("welcome-label");
+    if (wl) wl.textContent = "Welcome, " + USERNAME + "!";
+    renderDeco();
+    checkHashRoute();
 }
 
 function checkPageContext() {
@@ -752,7 +752,6 @@ function saveProfile() {
     closeProfileModal();
     toast("✅ Profile saved!");
 }
-
 /* ── OFFLINE MODAL ── */
 function openOfflineModal() {
     var m = document.getElementById("offline-modal");
@@ -2055,8 +2054,8 @@ function showGO(winIdx, bonus, blocked) {
         if (rematchBtn) rematchBtn.style.display = "none";
         if (primaryBtn) primaryBtn.style.display = "block";
     }
-if (youWin) setTimeout(launchConfetti, 220);
-stopTimer();
+    if (youWin) setTimeout(launchConfetti, 220);
+    stopTimer();
 }
 
 /* ── REMATCH ── */
@@ -2101,7 +2100,6 @@ function sendEmoji(emoji) {
         });
     }
 }
-
 function handleIncomingReaction(data) {
     if (!data || !data.reactions) return;
     var keys = Object.keys(data.reactions);
@@ -2783,13 +2781,15 @@ function renderDeco() {
         if (pct > 100) pct = 100;
         bar.style.width = pct + "%";
         txt.textContent = msgs[Math.min(4, Math.floor(pct / 25))];
-       if (pct >= 100) {
-  clearInterval(iv);
-  setTimeout(function() {
-    var ls = document.getElementById('LS');
-    if (ls) ls.classList.add('off');
-    var ms = document.getElementById('MS');
-    if (ms) ms.classList.remove('off');
-    renderDeco();
-  }, 340);
-}
+        if (pct >= 100) {
+            clearInterval(iv);
+            setTimeout(function () {
+                var ls = document.getElementById("LS");
+                if (ls) ls.classList.add("off");
+                var ms = document.getElementById("MS");
+                if (ms) ms.classList.remove("off");
+                renderDeco();
+            }, 340);
+        }
+    }, 58);
+})();
