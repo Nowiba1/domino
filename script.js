@@ -2055,9 +2055,8 @@ function showGO(winIdx, bonus, blocked) {
         if (rematchBtn) rematchBtn.style.display = "none";
         if (primaryBtn) primaryBtn.style.display = "block";
     }
-    if (youWin) setTimeout(launchConfetti, 220);
-    stopTimer();
-    stopVoiceChat();
+if (youWin) setTimeout(launchConfetti, 220);
+stopTimer();
 }
 
 /* ── REMATCH ── */
@@ -2799,6 +2798,3 @@ function renderDeco() {
         }
     }, 58);
 })();
-
-/* ── STOP VOICE CHAT (STUB - NO WebRTC) ── */
-function stopVoiceChat() {}
