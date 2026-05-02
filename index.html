@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>Dominoes</title>
-<link rel="icon" type="image/x-icon" href="favicon.svg">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="styles.css">
 <link rel="manifest" href="manifest.json">
 </head>
@@ -14,7 +14,7 @@
 <!-- USERNAME MODAL -->
 <div id="username-modal" class="off">
   <div class="uname-box">
-    <img src="logo.svg" alt="Dominoes Logo" class="uname-logo">
+    <img src="favicon.svg" alt="Dominoes Logo" class="uname-logo">
     <h2>Welcome to Dominoes!</h2>
     <p>Choose your domino nickname</p>
     <input type="text" id="uname-input" placeholder="Your name..." maxlength="16" autocomplete="off">
@@ -32,7 +32,7 @@
 <!-- MAIN MENU -->
 <div id="MS" class="sc off">
   <div class="logo">
-    <img src="logo.svg" alt="Dominoes" class="logo-img-main">
+    <img src="favicon.svg" alt="Dominoes" class="logo-img-main">
   </div>
   <div id="deco"></div>
   <div class="mp">
@@ -55,6 +55,12 @@
       <span><span class="mt">Join Room</span><span class="md">Enter a room code to join a game</span></span>
       <span class="mbg" style="background:rgba(77,186,122,.15);border-color:rgba(77,186,122,.3);color:var(--online-green)">JOIN</span>
     </button>
+
+    <button class="mbtn profile-btn" onclick="openProfileModal()">
+      <span class="mi">👤</span>
+      <span><span class="mt">Profile & Settings</span><span class="md">Customize skins, themes & more</span></span>
+      <span class="mbg" style="background:rgba(201,168,76,.15);border-color:rgba(201,168,76,.26);color:var(--gold-l)">YOU</span>
+    </button>
   </div>
   <div class="mfoot">
     <button class="mfbtn" id="ms-snd" onclick="toggleSound()">🔊 Sound On</button>
@@ -69,69 +75,48 @@
     <h2>🤖 Choose Game Mode</h2>
     <div class="modal-option sel" onclick="selectOfflineMode(1,this)">
       <div class="oradio"></div>
-      <div class="oinfo">
-        <div class="oititle">1 vs 1 — Duel</div>
-        <div class="oisub">7 tiles each · Head-to-head</div>
-      </div>
+      <div class="oinfo"><div class="oititle">1 vs 1 — Duel</div><div class="oisub">7 tiles each · Head-to-head</div></div>
     </div>
     <div class="modal-option" onclick="selectOfflineMode(2,this)">
       <div class="oradio"></div>
-      <div class="oinfo">
-        <div class="oititle">1 vs 2 — Three-Way</div>
-        <div class="oisub">5 tiles each · Three players</div>
-      </div>
+      <div class="oinfo"><div class="oititle">1 vs 2 — Three-Way</div><div class="oisub">5 tiles each · Three players</div></div>
     </div>
     <div class="modal-option" onclick="selectOfflineMode(3,this)">
       <div class="oradio"></div>
-      <div class="oinfo">
-        <div class="oititle">1 vs 3 — Classic Four</div>
-        <div class="oisub">5 tiles each · Most popular</div>
-      </div>
+      <div class="oinfo"><div class="oititle">1 vs 3 — Classic Four</div><div class="oisub">5 tiles each · Most popular</div></div>
     </div>
     <div class="modal-option" onclick="selectOfflineMode(4,this)">
       <div class="oradio"></div>
-      <div class="oinfo">
-        <div class="oititle">1 vs 4 — Big Table</div>
-        <div class="oisub">5 tiles each · Maximum chaos</div>
-      </div>
+      <div class="oinfo"><div class="oititle">1 vs 4 — Big Table</div><div class="oisub">5 tiles each · Maximum chaos</div></div>
     </div>
     <button class="rulebtn" onclick="startOfflineGame()" style="margin-top:10px">▶ Start Game</button>
     <button class="rulebtn" onclick="closeOfflineModal()" style="background:rgba(0,0,0,.3);color:var(--txt-dim);margin-top:6px">Cancel</button>
   </div>
 </div>
 
-<!-- ONLINE MULTIPLAYER MODAL (CREATE ONLY) -->
+<!-- ONLINE MODAL -->
 <div id="online-modal" class="off">
   <div class="modal-box">
     <h2>🌐 Online Multiplayer</h2>
     <p style="font-size:.75rem;color:var(--txt-dim);margin-bottom:12px">Create a room and invite friends</p>
     <div class="modal-option sel" onclick="selectOnlineMode('draw',this)">
       <div class="oradio"></div>
-      <div class="oinfo">
-        <div class="oititle">Classic Draw Game</div>
-        <div class="oisub">Standard rules · Draw from boneyard</div>
-      </div>
+      <div class="oinfo"><div class="oititle">Classic Draw Game</div><div class="oisub">Standard rules · Draw from boneyard</div></div>
     </div>
     <div class="modal-option" onclick="selectOnlineMode('block',this)">
       <div class="oradio"></div>
-      <div class="oinfo">
-        <div class="oititle">Block Game</div>
-        <div class="oisub">No drawing — pure strategy</div>
-      </div>
+      <div class="oinfo"><div class="oititle">Block Game</div><div class="oisub">No drawing — pure strategy</div></div>
     </div>
     <div class="modal-option" onclick="selectOnlineMode('allfives',this)">
       <div class="oradio"></div>
-      <div class="oinfo">
-        <div class="oititle">All Fives</div>
-        <div class="oisub">Score during play · Ends sum to 5's</div>
-      </div>
+      <div class="oinfo"><div class="oititle">All Fives</div><div class="oisub">Score during play · Ends sum to 5's</div></div>
     </div>
     <button class="rulebtn" onclick="createOnlineGame()" style="margin-top:10px">🎲 Create Room</button>
     <button class="rulebtn" onclick="closeOnlineModal()" style="background:rgba(0,0,0,.3);color:var(--txt-dim);margin-top:6px">Cancel</button>
   </div>
 </div>
 
-<!-- JOIN ROOM MODAL (JOIN ONLY) -->
+<!-- JOIN MODAL -->
 <div id="join-modal" class="off">
   <div class="modal-box">
     <h2>🚪 Join a Room</h2>
@@ -146,9 +131,7 @@
 <div id="spectate-list-modal" class="off">
   <div class="spec-list-box">
     <h2>👁️ Active Games</h2>
-    <div id="spec-rooms-list">
-      <p style="text-align:center;color:var(--txt-dim)">Loading...</p>
-    </div>
+    <div id="spec-rooms-list"><p style="text-align:center;color:var(--txt-dim)">Loading...</p></div>
     <button class="rulebtn" onclick="closeSpectateList()" style="margin-top:10px">Close</button>
   </div>
 </div>
@@ -161,16 +144,17 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
   import { getDatabase, ref, set, get, update, onValue, off, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
   
-const firebaseConfig = {
-  apiKey: "AIzaSyBaNjHmi-VlW8aFDDVN38OJkQCShYY2sFg",
-  authDomain: "dominos-ftw.firebaseapp.com",
-  databaseURL: "https://dominos-ftw-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "dominos-ftw",
-  storageBucket: "dominos-ftw.firebasestorage.app",
-  messagingSenderId: "476741872461",
-  appId: "1:476741872461:web:3dc979b05a6175eadda504",
-  measurementId: "G-1TBL91595F"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyBaNjHmi-VlW8aFDDVN38OJkQCShYY2sFg",
+    authDomain: "dominos-ftw.firebaseapp.com",
+    databaseURL: "https://dominos-ftw-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "dominos-ftw",
+    storageBucket: "dominos-ftw.firebasestorage.app",
+    messagingSenderId: "476741872461",
+    appId: "1:476741872461:web:3dc979b05a6175eadda504",
+    measurementId: "G-1TBL91595F"
+  };
+
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   
@@ -186,19 +170,17 @@ const firebaseConfig = {
   
   console.log('🔥 Firebase initialized for Dominoes multiplayer');
 
-   // Register Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
       navigator.serviceWorker.register('./sw.js').then(function(registration) {
-        console.log('📦 Service Worker registered with scope:', registration.scope);
+        console.log('📦 Service Worker registered');
       }).catch(function(error) {
-        console.log('❌ Service Worker registration failed:', error);
+        console.log('Service Worker not registered:', error);
       });
     });
   }
 </script>
 
-<!-- GAME SCRIPT -->
 <script src="script.js"></script>
 </body>
 </html>
