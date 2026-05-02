@@ -4,9 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>Dominoes</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" href="favicon.png">
 <link rel="stylesheet" href="styles.css">
-<link rel="manifest" href="manifest.json">
 </head>
 <body>
 <canvas id="pcv"></canvas>
@@ -14,7 +13,7 @@
 <!-- USERNAME MODAL -->
 <div id="username-modal" class="off">
   <div class="uname-box">
-    <img src="favicon.svg" alt="Dominoes Logo" class="uname-logo">
+    <img src="favicon.png" alt="Dominoes Logo" class="uname-logo">
     <h2>Welcome to Dominoes!</h2>
     <p>Choose your domino nickname</p>
     <input type="text" id="uname-input" placeholder="Your name..." maxlength="16" autocomplete="off">
@@ -32,7 +31,7 @@
 <!-- MAIN MENU -->
 <div id="MS" class="sc off">
   <div class="logo">
-    <img src="favicon.svg" alt="Dominoes" class="logo-img-main">
+    <img src="favicon.png" alt="Dominoes" class="logo-img-main">
   </div>
   <div id="deco"></div>
   <div class="mp">
@@ -139,7 +138,6 @@
 <!-- Toast Container -->
 <div id="toasts"></div>
 
-<!-- FIREBASE SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
   import { getDatabase, ref, set, get, update, onValue, off, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-database.js";
@@ -169,16 +167,6 @@
   window.firebaseOnDisconnect = onDisconnect;
   
   console.log('🔥 Firebase initialized for Dominoes multiplayer');
-
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('./sw.js').then(function(registration) {
-        console.log('📦 Service Worker registered');
-      }).catch(function(error) {
-        console.log('Service Worker not registered:', error);
-      });
-    });
-  }
 </script>
 
 <script src="script.js"></script>
