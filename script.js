@@ -465,14 +465,14 @@ function saveUsername() {
 }
 
 function showMenu() {
-    var ls = document.getElementById("LS"),
-        ms = document.getElementById("MS");
-    if (ls) ls.classList.add("off");
-    if (ms) ms.classList.remove("off");
-    var wl = document.getElementById("welcome-label");
-    if (wl) wl.textContent = "Welcome, " + USERNAME + "!";
-    renderDeco();
-    checkHashRoute();
+  var ls = document.getElementById('LS');
+  var ms = document.getElementById('MS');
+  if (ls) ls.classList.add('off');
+  if (ms) ms.classList.remove('off');
+  var wl = document.getElementById('welcome-label');
+  if (wl) wl.textContent = 'Welcome, ' + USERNAME + '!';
+  renderDeco();
+  checkHashRoute();
 }
 
 function checkPageContext() {
@@ -2783,18 +2783,13 @@ function renderDeco() {
         if (pct > 100) pct = 100;
         bar.style.width = pct + "%";
         txt.textContent = msgs[Math.min(4, Math.floor(pct / 25))];
-        if (pct >= 100) {
-            clearInterval(iv);
-            setTimeout(function () {
-                if (!USERNAME) {
-                } else {
-                    var ls = document.getElementById("LS");
-                    if (ls) ls.classList.add("off");
-                    var ms = document.getElementById("MS");
-                    if (ms) ms.classList.remove("off");
-                    renderDeco();
-                }
-            }, 340);
-        }
-    }, 58);
-})();
+       if (pct >= 100) {
+  clearInterval(iv);
+  setTimeout(function() {
+    var ls = document.getElementById('LS');
+    if (ls) ls.classList.add('off');
+    var ms = document.getElementById('MS');
+    if (ms) ms.classList.remove('off');
+    renderDeco();
+  }, 340);
+}
